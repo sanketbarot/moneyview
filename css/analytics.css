@@ -1,0 +1,85 @@
+/* ============================================================
+   AITOOLCOR MONEYWISE - REPORTS + ANALYTICS STYLES
+   ============================================================ */
+
+/* ── Report table ── */
+.data-table thead th {
+    background: rgba(0,0,0,0.02);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wider);
+    color: var(--text-muted);
+    padding: var(--space-3) var(--space-5);
+    border-bottom: 1px solid var(--border-color);
+    font-weight: var(--weight-semibold);
+}
+
+.data-table tbody td {
+    padding: var(--space-4) var(--space-5);
+    border-bottom: 1px solid var(--border-color);
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+}
+
+.data-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.data-table tbody tr:hover {
+    background: rgba(99,102,241,0.02);
+}
+
+/* ── Smart Tips ── */
+.smart-tip-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-4);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    transition: var(--transition);
+}
+
+.smart-tip-item:hover {
+    transform: translateX(4px);
+}
+
+.smart-tip-item.tip-success {
+    background: var(--success-bg);
+    border-color: var(--success-border);
+}
+
+.smart-tip-item.tip-warning {
+    background: var(--warning-bg);
+    border-color: var(--warning-border);
+}
+
+.smart-tip-item.tip-danger {
+    background: var(--danger-bg);
+    border-color: var(--danger-border);
+}
+
+.smart-tip-item.tip-info {
+    background: var(--info-bg);
+    border-color: var(--info-border);
+}
+
+.smart-tip-icon {
+    font-size: 1.4rem;
+    flex-shrink: 0;
+    line-height: 1;
+    margin-top: 2px;
+}
+
+.smart-tip-title {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+    color: var(--text-primary);
+    margin-bottom: 3px;
+}
+
+.smart-tip-desc {
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+    line-height: var(--leading-relaxed);
+}

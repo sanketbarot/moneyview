@@ -1,0 +1,215 @@
+/* ============================================================
+   AITOOLCOR MONEYWISE - RESPONSIVE
+   File: css/responsive.css
+   ============================================================ */
+
+/* ── LARGE SCREENS ── */
+@media (min-width: 1600px) {
+    :root { --sidebar-width: 300px; }
+    .layout-grid-4 { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* ── TABLET LANDSCAPE (1024-1199px) ── */
+@media (max-width: 1199px) {
+    .layout-grid-4   { grid-template-columns: repeat(2, 1fr); }
+    .layout-grid-3   { grid-template-columns: repeat(2, 1fr); }
+    .layout-grid-2-1 { grid-template-columns: 1fr; }
+    .layout-grid-1-2 { grid-template-columns: 1fr; }
+    .layout-grid-3-2 { grid-template-columns: 1fr; }
+
+    #donutChart .donut-wrap {
+        flex-direction: row;
+        align-items: flex-start;
+    }
+}
+
+/* ── TABLET PORTRAIT (768-1023px) ── */
+@media (max-width: 1023px) {
+    .layout-grid-4  { grid-template-columns: repeat(2, 1fr); }
+    .layout-grid-3  { grid-template-columns: 1fr 1fr; }
+    .layout-grid-2  { grid-template-columns: 1fr; }
+    .layout-row     { flex-direction: column; }
+
+    .topbar-search  { max-width: 200px; }
+}
+
+/* ── MOBILE (< 768px) ── */
+@media (max-width: 767px) {
+    /* Sidebar */
+    .sidebar {
+        transform: translateX(-100%);
+        box-shadow: var(--shadow-xl);
+    }
+
+    .sidebar.mobile-open {
+        transform: translateX(0);
+    }
+
+    .main-wrapper {
+        margin-left: 0 !important;
+    }
+
+    .menu-toggle {
+        display: flex !important;
+    }
+
+    /* Topbar */
+    .topbar {
+        padding: 0 var(--space-4);
+        height: 56px;
+    }
+
+    .topbar-search {
+        max-width: 140px;
+    }
+
+    .topbar-search input:focus {
+        width: 170px;
+    }
+
+    .topbar-currency { display: none; }
+
+    /* Topbar quick add - icon only */
+    .topbar-quick-add .btn-label {
+        display: none;
+    }
+
+    .topbar-quick-add {
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        border-radius: var(--radius-md);
+        justify-content: center;
+    }
+
+    /* Page area */
+    .page-area {
+        padding: var(--space-4) var(--space-3);
+    }
+
+    /* Grids */
+    .layout-grid-4 { grid-template-columns: 1fr; }
+    .layout-grid-3 { grid-template-columns: 1fr; }
+    .layout-grid-2 { grid-template-columns: 1fr; }
+    .layout-grid-2-1 { grid-template-columns: 1fr; }
+    .layout-grid-1-2 { grid-template-columns: 1fr; }
+    .layout-grid-3-2 { grid-template-columns: 1fr; }
+
+    /* Page header */
+    .pg-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-3);
+    }
+
+    .pg-title { font-size: var(--text-xl); }
+
+    /* TX summary */
+    .tx-summary-wrap {
+        gap: var(--space-3);
+    }
+
+    .tx-summary-divider { display: none; }
+
+    .tx-sum-value { font-size: var(--text-lg); }
+
+    /* Filter bar */
+    .filter-bar {
+        gap: var(--space-2);
+    }
+
+    .filter-select,
+    .filter-input {
+        font-size: var(--text-xs);
+        padding: 7px 10px;
+    }
+
+    /* Modal */
+    .modal {
+        max-width: 100%;
+        max-height: 95vh;
+        border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    }
+
+    .modal-overlay {
+        align-items: flex-end;
+        padding: 0;
+    }
+
+    /* Form grid */
+    .form-grid { grid-template-columns: 1fr; }
+    .form-group.col-span-2 { grid-column: span 1; }
+
+    /* Stat card amounts */
+    .stat-card-amount { font-size: var(--text-2xl); }
+
+    /* Notification panel */
+    .notif-panel {
+        right: var(--space-3);
+        width: calc(100vw - 24px);
+        max-height: 60vh;
+    }
+
+    /* Goals grid */
+    #goalsGrid { grid-template-columns: 1fr !important; }
+
+    /* Accounts grid */
+    #accountsGrid { grid-template-columns: 1fr !important; }
+}
+
+/* ── SMALL MOBILE (< 480px) ── */
+@media (max-width: 479px) {
+    .topbar-search { display: none; }
+
+    .page-area { padding: var(--space-3) var(--space-2); }
+
+    .stat-card-amount { font-size: var(--text-xl); }
+
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .pg-actions { width: 100%; }
+
+    .pg-actions .btn { flex: 1; justify-content: center; }
+
+    .bill-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .bill-item-right { width: 100%; justify-content: space-between; }
+}
+
+/* ── PRINT STYLES ── */
+@media print {
+    .sidebar,
+    .topbar,
+    .scroll-top-btn,
+    .toast-container,
+    .modal-overlay,
+    .pg-actions,
+    .filter-bar,
+    .pagination { display: none !important; }
+
+    .main-wrapper { margin-left: 0 !important; }
+
+    .page-area { padding: 0 !important; }
+
+    .card {
+        break-inside: avoid;
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+        background: white !important;
+        backdrop-filter: none !important;
+    }
+
+    body {
+        background: white !important;
+        color: black !important;
+    }
+
+    .glass-mesh-bg,
+    .glass-bg-orbs { display: none !important; }
+}

@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AitoolCor MoneyWise - Smart Money Manager. Sign in to track expenses, manage budgets and achieve your financial goals.">
+    <meta name="theme-color" content="#6366F1">
+    <title>Sign In — AitoolCor MoneyWise</title>
+
+    <!-- Favicon -->
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/glass.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/auth.css">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+</head>
+<body>
+
+<!-- ── GLASS BACKGROUND ORBS ── -->
+<div class="glass-bg-orbs">
+    <div class="glass-orb orb-1"></div>
+    <div class="glass-orb orb-2"></div>
+    <div class="glass-orb orb-3"></div>
+    <div class="glass-orb orb-4"></div>
+    <div class="glass-orb orb-5"></div>
+</div>
+<div class="glass-mesh-bg"></div>
+
+<!-- ── LOADER ── -->
+<div class="loader-screen" id="loaderScreen">
+    <div class="loader-content">
+        <div class="loader-icon-wrap loader-bounce">
+            <i class="fas fa-wallet"></i>
+        </div>
+        <div class="loader-title">
+            AitoolCor <span>MoneyWise</span>
+        </div>
+        <div class="loader-bar-wrap">
+            <div class="loader-bar-fill loader-slide"></div>
+        </div>
+        <p class="loader-text">Preparing your workspace...</p>
+    </div>
+</div>
+
+<!-- ── TOAST CONTAINER ── -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ── AUTH PAGE ── -->
+<div class="auth-page">
+
+    <!-- ── LEFT PANEL ── -->
+    <div class="auth-left">
+        <div class="auth-left-content">
+
+            <!-- Logo -->
+            <div class="auth-logo">
+                <div class="auth-logo-icon">
+                    <i class="fas fa-wallet"></i>
+                </div>
+                <div class="auth-logo-text">
+                    <span class="auth-logo-brand">AitoolCor</span>
+                    <span class="auth-logo-name">MoneyWise</span>
+                </div>
+            </div>
+
+            <!-- Headline -->
+            <div class="auth-headline">
+                <h1>Smart Money<br>Management<br>Made Simple</h1>
+                <p>Track expenses, set budgets, achieve goals, and get AI-powered insights — all in one beautiful platform.</p>
+            </div>
+
+            <!-- Features -->
+            <div class="auth-features">
+                <div class="auth-feature">
+                    <div class="auth-feature-icon">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <div class="auth-feature-text">
+                        <div class="auth-feature-title">Smart Budgets</div>
+                        <div class="auth-feature-desc">Set limits and get alerts before overspending</div>
+                    </div>
+                </div>
+
+                <div class="auth-feature">
+                    <div class="auth-feature-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="auth-feature-text">
+                        <div class="auth-feature-title">AI Insights</div>
+                        <div class="auth-feature-desc">Get personalized tips to grow your savings</div>
+                    </div>
+                </div>
+
+                <div class="auth-feature">
+                    <div class="auth-feature-icon">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                    <div class="auth-feature-text">
+                        <div class="auth-feature-title">Savings Goals</div>
+                        <div class="auth-feature-desc">Track progress toward your financial dreams</div>
+                    </div>
+                </div>
+
+                <div class="auth-feature">
+                    <div class="auth-feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="auth-feature-text">
+                        <div class="auth-feature-title">100% Private</div>
+                        <div class="auth-feature-desc">Your data stays on your device, always secure</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Left Footer Stats -->
+        <div class="auth-left-footer">
+            <div class="auth-stats">
+                <div class="auth-stat">
+                    <span class="auth-stat-number">50K+</span>
+                    <span class="auth-stat-label">Active Users</span>
+                </div>
+                <div class="auth-stat">
+                    <span class="auth-stat-number">$2.5M+</span>
+                    <span class="auth-stat-label">Tracked</span>
+                </div>
+                <div class="auth-stat">
+                    <span class="auth-stat-number">4.9★</span>
+                    <span class="auth-stat-label">Rating</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Floating Cards -->
+        <div class="auth-floating-cards">
+            <div class="auth-float-card">
+                <div class="afc-icon green">
+                    <i class="fas fa-arrow-down"></i>
+                </div>
+                <div class="afc-text">
+                    <span class="afc-title">+$4,500 Received</span>
+                    <span class="afc-sub">Monthly Salary</span>
+                </div>
+            </div>
+
+            <div class="auth-float-card">
+                <div class="afc-icon yellow">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <div class="afc-text">
+                    <span class="afc-title">Budget Alert</span>
+                    <span class="afc-sub">Food: 82% used</span>
+                </div>
+            </div>
+
+            <div class="auth-float-card">
+                <div class="afc-icon blue">
+                    <i class="fas fa-bullseye"></i>
+                </div>
+                <div class="afc-text">
+                    <span class="afc-title">Goal: 68% Done</span>
+                    <span class="afc-sub">Vacation Fund ✈️</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── RIGHT PANEL ── -->
+    <div class="auth-right">
+        <div class="auth-form-wrap">
+
+            <!-- ── LOGIN FORM ── -->
+            <div class="auth-form-panel active" id="loginPanel">
+
+                <div class="auth-form-header">
+                    <h2 class="auth-form-title">Welcome back 👋</h2>
+                    <p class="auth-form-subtitle">Sign in to manage your finances</p>
+                </div>
+
+                <!-- Google Sign In -->
+                <button class="auth-google-btn hover-lift" id="googleSignInBtn" type="button">
+                    <svg class="google-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                    </svg>
+                    Continue with Google
+                </button>
+
+                <!-- Divider -->
+                <div class="auth-divider">
+                    <span>or continue with email</span>
+                </div>
+
+                <!-- Login Fields -->
+                <div class="auth-fields">
+                    <!-- Email -->
+                    <div class="auth-field">
+                        <label for="loginEmail">Email Address</label>
+                        <div class="auth-input-wrap">
+                            <input
+                                type="email"
+                                id="loginEmail"
+                                class="auth-input"
+                                placeholder="you@example.com"
+                                autocomplete="email"
+                                inputmode="email"
+                            >
+                            <i class="fas fa-envelope auth-input-icon"></i>
+                        </div>
+                        <div class="auth-field-error" id="loginEmailError">
+                            <i class="fas fa-circle-exclamation"></i>
+                            <span></span>
+                        </div>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="auth-field">
+                        <label for="loginPassword">Password</label>
+                        <div class="auth-input-wrap" style="position:relative;">
+                            <input
+                                type="password"
+                                id="loginPassword"
+                                class="auth-input"
+                                placeholder="Enter your password"
+                                autocomplete="current-password"
+                                style="padding-right: 44px;"
+                            >
+                            <i class="fas fa-lock auth-input-icon"></i>
+                            <button
+                                type="button"
+                                class="auth-pw-toggle"
+                                onclick="togglePw('loginPassword', this)"
+                                tabindex="-1"
+                            >
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="auth-field-error" id="loginPasswordError">
+                            <i class="fas fa-circle-exclamation"></i>
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Remember + Forgot -->
+                <div class="auth-extras">
+                    <label class="auth-remember">
+                        <input type="checkbox" id="rememberMe">
+                        <span>Remember me</span>
+                    </label>
+                    <a href="#" class="auth-forgot" id="forgotPwBtn">Forgot password?</a>
+                </div>
+
+                <!-- Submit -->
+                <button class="auth-submit" id="loginSubmitBtn" type="button">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Sign In
+                </button>
+
+                <!-- Divider -->
+                <div class="auth-divider">
+                    <span>or</span>
+                </div>
+
+                <!-- Guest -->
+                <button class="auth-guest-btn hover-lift" id="guestBtn" type="button">
+                    <i class="fas fa-user-secret"></i>
+                    Continue as Guest
+                </button>
+
+                <!-- Switch to Register -->
+                <div class="auth-switch">
+                    Don't have an account?
+                    <button type="button" onclick="switchForm('register')">
+                        Create account
+                    </button>
+                </div>
+
+            </div>
+            <!-- END LOGIN FORM -->
+
+            <!-- ── REGISTER FORM ── -->
+            <div class="auth-form-panel" id="registerPanel">
+
+                <div class="auth-form-header">
+                    <h2 class="auth-form-title">Create account ✨</h2>
+                    <p class="auth-form-subtitle">Start your financial journey today</p>
+                </div>
+
+                <!-- Google Sign Up -->
+                <button class="auth-google-btn hover-lift" id="googleRegisterBtn" type="button">
+                    <svg class="google-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                    </svg>
+                    Sign up with Google
+                </button>
+
+                <!-- Divider -->
+                <div class="auth-divider">
+                    <span>or sign up with email</span>
+                </div>
+
+                <!-- Register Fields -->
+                <div class="auth-fields">
+                    <!-- Name -->
+                    <div class="auth-field">
+                        <label for="registerName">Full Name</label>
+                        <div class="auth-input-wrap">
+                            <input
+                                type="text"
+                                id="registerName"
+                                class="auth-input"
+                                placeholder="John Doe"
+                                autocomplete="name"
+                            >
+                            <i class="fas fa-user auth-input-icon"></i>
+                        </div>
+                        <div class="auth-field-error" id="registerNameError">
+                            <i class="fas fa-circle-exclamation"></i>
+                            <span></span>
+                        </div>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="auth-field">
+                        <label for="registerEmail">Email Address</label>
+                        <div class="auth-input-wrap">
+                            <input
+                                type="email"
+                                id="registerEmail"
+                                class="auth-input"
+                                placeholder="you@example.com"
+                                autocomplete="email"
+                                inputmode="email"
+                            >
+                            <i class="fas fa-envelope auth-input-icon"></i>
+                        </div>
+                        <div class="auth-field-error" id="registerEmailError">
+                            <i class="fas fa-circle-exclamation"></i>
+                            <span></span>
+                        </div>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="auth-field">
+                        <label for="registerPassword">Password</label>
+                        <div class="auth-input-wrap" style="position:relative;">
+                            <input
+                                type="password"
+                                id="registerPassword"
+                                class="auth-input"
+                                placeholder="Min. 6 characters"
+                                autocomplete="new-password"
+                                style="padding-right: 44px;"
+                                oninput="checkPasswordStrength(this.value)"
+                            >
+                            <i class="fas fa-lock auth-input-icon"></i>
+                            <button
+                                type="button"
+                                class="auth-pw-toggle"
+                                onclick="togglePw('registerPassword', this)"
+                                tabindex="-1"
+                            >
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <!-- Strength Meter -->
+                        <div class="pw-strength" id="pwStrengthWrap" style="display:none;">
+                            <div class="pw-strength-bars">
+                                <div class="pw-bar" id="pwBar1"></div>
+                                <div class="pw-bar" id="pwBar2"></div>
+                                <div class="pw-bar" id="pwBar3"></div>
+                                <div class="pw-bar" id="pwBar4"></div>
+                            </div>
+                            <span class="pw-strength-label" id="pwStrengthLabel"></span>
+                        </div>
+                        <div class="auth-field-error" id="registerPasswordError">
+                            <i class="fas fa-circle-exclamation"></i>
+                            <span></span>
+                        </div>
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div class="auth-field">
+                        <label for="registerConfirmPassword">Confirm Password</label>
+                        <div class="auth-input-wrap" style="position:relative;">
+                            <input
+                                type="password"
+                                id="registerConfirmPassword"
+                                class="auth-input"
+                                placeholder="Repeat your password"
+                                autocomplete="new-password"
+                                style="padding-right: 44px;"
+                            >
+                            <i class="fas fa-lock auth-input-icon"></i>
+                            <button
+                                type="button"
+                                class="auth-pw-toggle"
+                                onclick="togglePw('registerConfirmPassword', this)"
+                                tabindex="-1"
+                            >
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="auth-field-error" id="registerConfirmError">
+                            <i class="fas fa-circle-exclamation"></i>
+                            <span></span>
+                        </div>
+                    </div>
+
+                    <!-- Terms -->
+                    <label class="auth-terms">
+                        <input type="checkbox" id="termsCheckbox">
+                        <span class="auth-terms-text">
+                            I agree to the
+                            <a href="#" onclick="return false;">Terms of Service</a>
+                            and
+                            <a href="#" onclick="return false;">Privacy Policy</a>
+                        </span>
+                    </label>
+                </div>
+
+                <!-- Submit -->
+                <button class="auth-submit" id="registerSubmitBtn" type="button">
+                    <i class="fas fa-user-plus"></i>
+                    Create Account
+                </button>
+
+                <!-- Switch to Login -->
+                <div class="auth-switch">
+                    Already have an account?
+                    <button type="button" onclick="switchForm('login')">
+                        Sign in
+                    </button>
+                </div>
+
+            </div>
+            <!-- END REGISTER FORM -->
+
+        </div>
+
+        <!-- Page Footer -->
+        <div class="auth-page-footer">
+            <span>© 2025 AitoolCor</span>
+            <span>·</span>
+            <a href="#">Privacy</a>
+            <span>·</span>
+            <a href="#">Terms</a>
+            <span>·</span>
+            <a href="https://aitoolcor.com" target="_blank">aitoolcor.com</a>
+        </div>
+    </div>
+
+</div>
+<!-- END AUTH PAGE -->
+
+<!-- JS -->
+<script src="js/toast.js"></script>
+<script src="js/auth.js"></script>
+
+</body>
+</html>

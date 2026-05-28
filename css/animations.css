@@ -1,0 +1,670 @@
+/* ============================================================
+   AITOOLCOR MONEYWISE - ANIMATIONS
+   File: css/animations.css
+   Description: Hover + Page Transitions + Micro-interactions
+   NO scroll animations (as requested)
+   ============================================================ */
+
+/* ── PAGE TRANSITIONS ── */
+.page-enter {
+    animation: pageEnter 0.4s var(--ease-default) forwards;
+}
+
+@keyframes pageEnter {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.page-enter-slide {
+    animation: pageSlide 0.4s var(--ease-default) forwards;
+}
+
+@keyframes pageSlide {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.page-enter-zoom {
+    animation: pageZoom 0.35s var(--ease-default) forwards;
+}
+
+@keyframes pageZoom {
+    from {
+        opacity: 0;
+        transform: scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* ── STAGGER DELAYS (for page content) ── */
+.stagger-1 { animation-delay: 0.03s; }
+.stagger-2 { animation-delay: 0.06s; }
+.stagger-3 { animation-delay: 0.09s; }
+.stagger-4 { animation-delay: 0.12s; }
+.stagger-5 { animation-delay: 0.15s; }
+.stagger-6 { animation-delay: 0.18s; }
+.stagger-7 { animation-delay: 0.21s; }
+.stagger-8 { animation-delay: 0.24s; }
+.stagger-9 { animation-delay: 0.27s; }
+.stagger-10 { animation-delay: 0.30s; }
+.stagger-11 { animation-delay: 0.33s; }
+.stagger-12 { animation-delay: 0.36s; }
+
+/* ── HOVER: CARDS ── */
+.hover-lift {
+    transition: transform var(--duration-normal) var(--ease-default),
+                box-shadow var(--duration-normal) var(--ease-default);
+}
+
+.hover-lift:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-card-hover);
+}
+
+.hover-glow {
+    transition: var(--transition);
+}
+
+.hover-glow:hover {
+    box-shadow: var(--shadow-card-hover), var(--shadow-glow-sm);
+}
+
+.hover-scale {
+    transition: transform var(--duration-normal) var(--ease-default);
+}
+
+.hover-scale:hover {
+    transform: scale(1.03);
+}
+
+.hover-border-primary {
+    transition: border-color var(--duration-normal) var(--ease-default);
+}
+
+.hover-border-primary:hover {
+    border-color: var(--primary) !important;
+}
+
+/* ── HOVER: SHINE SWEEP ── */
+.hover-shine {
+    position: relative;
+    overflow: hidden;
+}
+
+.hover-shine::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -60%;
+    width: 40%;
+    height: 200%;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.35) 50%,
+        transparent 100%
+    );
+    transform: skewX(-20deg);
+    transition: left 0.6s var(--ease-smooth);
+    pointer-events: none;
+    z-index: 3;
+}
+
+.hover-shine:hover::after {
+    left: 130%;
+}
+
+/* ── HOVER: BUTTONS ── */
+.btn-hover-lift {
+    transition: transform var(--duration-normal) var(--ease-default),
+                box-shadow var(--duration-normal) var(--ease-default);
+}
+
+.btn-hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow-sm);
+}
+
+.btn-hover-lift:active {
+    transform: translateY(0);
+}
+
+/* Button ripple effect */
+.btn-ripple {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-ripple::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: radial-gradient(circle, rgba(255,255,255,0.3) 10%, transparent 70%);
+    transform: scale(0);
+    opacity: 0;
+    transition: transform 0.5s, opacity 0.4s;
+    pointer-events: none;
+}
+
+.btn-ripple:active::after {
+    transform: scale(3);
+    opacity: 1;
+    transition: 0s;
+}
+
+/* Button pulse */
+.btn-pulse:hover {
+    animation: btnPulse 1.5s ease infinite;
+}
+
+@keyframes btnPulse {
+    0%, 100% { box-shadow: 0 0 0 0 var(--primary-glow); }
+    50% { box-shadow: 0 0 0 8px transparent; }
+}
+
+/* ── HOVER: ICONS ── */
+.icon-hover-bounce:hover {
+    animation: iconBounce 0.4s var(--ease-bounce);
+}
+
+@keyframes iconBounce {
+    0% { transform: translateY(0); }
+    40% { transform: translateY(-5px); }
+    60% { transform: translateY(-2px); }
+    100% { transform: translateY(0); }
+}
+
+.icon-hover-rotate:hover {
+    transform: rotate(15deg);
+    transition: transform var(--duration-normal) var(--ease-bounce);
+}
+
+.icon-hover-scale:hover {
+    transform: scale(1.25);
+    transition: transform var(--duration-normal) var(--ease-bounce);
+}
+
+.icon-hover-shake:hover {
+    animation: iconShake 0.4s ease;
+}
+
+@keyframes iconShake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-3px); }
+    40% { transform: translateX(3px); }
+    60% { transform: translateX(-2px); }
+    80% { transform: translateX(2px); }
+}
+
+/* ── HOVER: NAV ITEMS ── */
+.nav-hover-slide {
+    position: relative;
+}
+
+.nav-hover-slide::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--primary);
+    transition: width var(--duration-normal) var(--ease-default),
+                left var(--duration-normal) var(--ease-default);
+}
+
+.nav-hover-slide:hover::after {
+    width: 100%;
+    left: 0;
+}
+
+/* ── HOVER: LIST ITEMS ── */
+.item-hover-slide:hover {
+    transform: translateX(4px);
+    transition: transform var(--duration-normal) var(--ease-default);
+}
+
+.item-hover-bg {
+    transition: background-color var(--duration-fast) var(--ease-default);
+}
+
+.item-hover-bg:hover {
+    background: var(--glass-bg-dark);
+}
+
+/* ── CHART ANIMATIONS ── */
+.chart-bar-grow {
+    animation: barGrow 0.8s var(--ease-elastic) forwards;
+    transform-origin: bottom;
+}
+
+@keyframes barGrow {
+    from {
+        transform: scaleY(0);
+        opacity: 0;
+    }
+    to {
+        transform: scaleY(1);
+        opacity: 1;
+    }
+}
+
+.chart-donut-draw {
+    animation: donutDraw 1.2s var(--ease-default) forwards;
+}
+
+@keyframes donutDraw {
+    from {
+        stroke-dashoffset: var(--circumference, 345);
+    }
+    to {
+        stroke-dashoffset: var(--offset, 0);
+    }
+}
+
+.chart-line-draw {
+    stroke-dasharray: var(--length, 1000);
+    stroke-dashoffset: var(--length, 1000);
+    animation: lineDraw 1.5s var(--ease-default) forwards;
+}
+
+@keyframes lineDraw {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+/* ── PROGRESS BAR ANIMATION ── */
+.progress-animate {
+    animation: progressGrow 1s var(--ease-default) forwards;
+}
+
+@keyframes progressGrow {
+    from { width: 0%; }
+}
+
+/* Progress shimmer */
+.progress-shimmer {
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-shimmer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.3) 50%,
+        transparent 100%
+    );
+    animation: shimmerSlide 2s ease infinite;
+}
+
+@keyframes shimmerSlide {
+    to { left: 100%; }
+}
+
+/* ── COUNTER ANIMATION (JS-triggered) ── */
+.counter-animate {
+    transition: none;
+}
+
+/* ── MODAL ANIMATIONS ── */
+.modal-enter {
+    animation: modalEnter 0.35s var(--ease-default) forwards;
+}
+
+@keyframes modalEnter {
+    from {
+        opacity: 0;
+        transform: scale(0.92) translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.modal-exit {
+    animation: modalExit 0.25s var(--ease-default) forwards;
+}
+
+@keyframes modalExit {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+}
+
+.overlay-enter {
+    animation: overlayIn 0.3s var(--ease-default) forwards;
+}
+
+@keyframes overlayIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.overlay-exit {
+    animation: overlayOut 0.2s var(--ease-default) forwards;
+}
+
+@keyframes overlayOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+/* ── TOAST ANIMATIONS ── */
+.toast-enter {
+    animation: toastIn 0.4s var(--ease-elastic) forwards;
+}
+
+@keyframes toastIn {
+    from {
+        transform: translateX(120%) scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0) scale(1);
+        opacity: 1;
+    }
+}
+
+.toast-exit {
+    animation: toastOut 0.3s var(--ease-default) forwards;
+}
+
+@keyframes toastOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+}
+
+/* ── SKELETON SHIMMER ── */
+.skeleton {
+    background: linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 0.04) 25%,
+        rgba(0, 0, 0, 0.08) 50%,
+        rgba(0, 0, 0, 0.04) 75%
+    );
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.5s ease infinite;
+    border-radius: var(--radius-sm);
+}
+
+@keyframes skeletonShimmer {
+    from { background-position: 200% 0; }
+    to { background-position: -200% 0; }
+}
+
+/* ── TOGGLE SWITCH ANIMATION ── */
+.toggle-knob {
+    transition: transform var(--duration-normal) var(--ease-bounce),
+                background-color var(--duration-normal) var(--ease-default);
+}
+
+/* ── INPUT FOCUS ANIMATION ── */
+.input-focus-ring {
+    transition: border-color var(--duration-normal) var(--ease-default),
+                box-shadow var(--duration-normal) var(--ease-default);
+}
+
+.input-focus-ring:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+/* ── FLOATING LABEL ── */
+.float-label {
+    position: absolute;
+    top: 50%;
+    left: 14px;
+    transform: translateY(-50%);
+    font-size: var(--text-base);
+    color: var(--text-muted);
+    pointer-events: none;
+    transition: all var(--duration-normal) var(--ease-default);
+    background: transparent;
+    padding: 0 4px;
+}
+
+.float-label.active,
+.form-control:focus + .float-label,
+.form-control:not(:placeholder-shown) + .float-label {
+    top: 0;
+    font-size: var(--text-xs);
+    color: var(--primary);
+    background: white;
+}
+
+/* ── LOADING SPINNER ── */
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 2.5px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+}
+
+.spinner-primary {
+    border-color: var(--primary-bg);
+    border-top-color: var(--primary);
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ── LOADER SCREEN ── */
+.loader-bounce {
+    animation: loaderBounce 1.5s var(--ease-default) infinite;
+}
+
+@keyframes loaderBounce {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 var(--primary-glow);
+    }
+    50% {
+        transform: scale(1.06);
+        box-shadow: 0 0 30px 12px var(--primary-glow);
+    }
+}
+
+.loader-slide {
+    animation: loaderSlide 1.2s var(--ease-default) infinite;
+}
+
+@keyframes loaderSlide {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(500%); }
+}
+
+/* ── DELETE ITEM ── */
+.item-removing {
+    animation: itemRemove 0.3s var(--ease-default) forwards;
+}
+
+@keyframes itemRemove {
+    to {
+        opacity: 0;
+        transform: translateX(30px);
+        height: 0;
+        padding: 0;
+        margin: 0;
+        overflow: hidden;
+    }
+}
+
+/* ── ADD ITEM ── */
+.item-adding {
+    animation: itemAdd 0.4s var(--ease-elastic) forwards;
+}
+
+@keyframes itemAdd {
+    from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ── SUCCESS CHECK ── */
+.success-check {
+    animation: successPop 0.5s var(--ease-bounce) forwards;
+}
+
+@keyframes successPop {
+    0% { transform: scale(0); opacity: 0; }
+    60% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(1); }
+}
+
+/* ── NUMBER TICKER ── */
+.number-tick {
+    display: inline-block;
+    transition: transform 0.3s var(--ease-default);
+}
+
+/* ── PASSWORD STRENGTH METER ── */
+.strength-meter {
+    transition: width 0.4s var(--ease-default),
+                background-color 0.4s var(--ease-default);
+}
+
+/* ── TAB INDICATOR ── */
+.tab-indicator {
+    transition: left var(--duration-normal) var(--ease-default),
+                width var(--duration-normal) var(--ease-default);
+}
+
+/* ── TOOLTIP ── */
+.tooltip {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(4px);
+    transition: all var(--duration-fast) var(--ease-default);
+}
+
+.tooltip-trigger:hover .tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* ── NOTIFICATION BADGE BOUNCE ── */
+.badge-bounce {
+    animation: badgeBounce 0.4s var(--ease-bounce);
+}
+
+@keyframes badgeBounce {
+    0% { transform: scale(0); }
+    60% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
+/* ── AUTH PAGE SPECIFIC ── */
+.auth-form-enter {
+    animation: authFormIn 0.5s var(--ease-default) forwards;
+}
+
+@keyframes authFormIn {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.auth-form-exit {
+    animation: authFormOut 0.3s var(--ease-default) forwards;
+}
+
+@keyframes authFormOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+}
+
+/* Gradient border animation for auth card */
+.gradient-border {
+    position: relative;
+}
+
+.gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    background: linear-gradient(
+        135deg,
+        var(--primary),
+        var(--secondary),
+        var(--success),
+        var(--primary)
+    );
+    background-size: 300% 300%;
+    animation: gradientShift 6s ease infinite;
+    z-index: -1;
+    opacity: 0.5;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* ── DISABLE ALL ANIMATIONS (accessibility) ── */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

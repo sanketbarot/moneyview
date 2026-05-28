@@ -1,0 +1,196 @@
+/* ============================================================
+   AITOOLCOR MONEYWISE - GOALS STYLES
+   File: css/goals.css
+   ============================================================ */
+
+/* ══════════════════════════════════
+   GOAL CARD
+══════════════════════════════════ */
+.goal-card {
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: var(--transition);
+}
+
+.goal-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: var(--space-5) var(--space-5) 0;
+}
+
+.goal-emoji-wrap {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.goal-emoji {
+    font-size: 2rem;
+    line-height: 1;
+}
+
+.goal-badge {
+    padding: 3px 10px;
+    border-radius: var(--radius-full);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-bold);
+}
+
+.goal-badge.active {
+    background: rgba(99,102,241,0.1);
+    color: var(--primary);
+}
+
+.goal-badge.done {
+    background: var(--success-bg);
+    color: var(--success);
+}
+
+.goal-card-menu {
+    display: flex;
+    gap: var(--space-1);
+    opacity: 0;
+    transition: opacity var(--duration-fast) var(--ease-default);
+}
+
+.goal-card:hover .goal-card-menu {
+    opacity: 1;
+}
+
+.goal-card-body {
+    padding: var(--space-4) var(--space-5);
+    flex: 1;
+}
+
+.goal-name {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-extrabold);
+    color: var(--text-primary);
+    margin-bottom: var(--space-3);
+    letter-spacing: var(--tracking-tight);
+}
+
+.goal-target-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+    flex-wrap: wrap;
+}
+
+.goal-target-label {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+}
+
+.goal-target-value {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+    color: var(--text-secondary);
+}
+
+.goal-deadline {
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    margin-left: auto;
+}
+
+/* Progress */
+.goal-progress-wrap {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+}
+
+.goal-progress-bar {
+    flex: 1;
+    height: 10px;
+}
+
+.goal-pct-label {
+    font-size: var(--text-xs);
+    font-weight: var(--weight-extrabold);
+    color: var(--primary);
+    min-width: 34px;
+    text-align: right;
+}
+
+/* Amounts */
+.goal-amounts {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+}
+
+.goal-saved-wrap,
+.goal-remaining-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.goal-remaining-wrap {
+    text-align: right;
+}
+
+.goal-saved-label,
+.goal-remaining-label {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+}
+
+.goal-saved-value {
+    font-size: var(--text-md);
+    font-weight: var(--weight-extrabold);
+    color: var(--primary);
+}
+
+.goal-remaining-value {
+    font-size: var(--text-md);
+    font-weight: var(--weight-extrabold);
+}
+
+/* Footer */
+.goal-card-footer {
+    padding: var(--space-4) var(--space-5) var(--space-5);
+    border-top: 1px solid var(--glass-border);
+    margin-top: auto;
+}
+
+/* Add Goal Card */
+.goal-add-card {
+    border-radius: var(--radius-lg);
+    border: 2px dashed var(--glass-border) !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    min-height: 200px;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: var(--text-base);
+    font-weight: var(--weight-semibold);
+    font-family: var(--font-family);
+    transition: var(--transition);
+    background: transparent !important;
+}
+
+.goal-add-card i {
+    font-size: 1.5rem;
+    opacity: 0.5;
+}
+
+.goal-add-card:hover {
+    border-color: var(--primary) !important;
+    color: var(--primary);
+    transform: translateY(-4px);
+}
+
+.goal-add-card:hover i {
+    opacity: 1;
+}

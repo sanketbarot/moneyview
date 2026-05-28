@@ -1,0 +1,140 @@
+/* ============================================================
+   AITOOLCOR MONEYWISE - BUDGETS STYLES
+   File: css/budgets.css
+   ============================================================ */
+
+/* ══════════════════════════════════
+   BUDGET CARD ITEM
+══════════════════════════════════ */
+.budget-card-item {
+    padding: var(--space-5);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-4);
+    transition: var(--transition);
+    cursor: default;
+}
+
+.budget-card-item:last-child {
+    margin-bottom: 0;
+}
+
+.budget-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: var(--space-4);
+    flex-wrap: wrap;
+    gap: var(--space-3);
+}
+
+.budget-card-left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.budget-cat-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--text-lg);
+    flex-shrink: 0;
+}
+
+.budget-cat-name {
+    font-size: var(--text-md);
+    font-weight: var(--weight-bold);
+    color: var(--text-primary);
+}
+
+.budget-period {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.budget-card-right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.budget-amounts {
+    text-align: right;
+}
+
+.budget-spent {
+    font-size: var(--text-xl);
+    font-weight: var(--weight-extrabold);
+    display: block;
+    line-height: 1;
+}
+
+.budget-limit-text {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    display: block;
+    margin-top: 3px;
+}
+
+.budget-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.budget-status-icon {
+    font-size: 1.2rem;
+}
+
+/* ══════════════════════════════════
+   PROGRESS
+══════════════════════════════════ */
+.budget-progress-wrap {
+    margin-top: var(--space-2);
+}
+
+.budget-progress-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: var(--space-2);
+}
+
+.budget-pct {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+}
+
+/* ══════════════════════════════════
+   ALERT BANNERS
+══════════════════════════════════ */
+.budget-alert-banner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    background: var(--danger-bg);
+    border: 1px solid var(--danger-border);
+    border-radius: var(--radius-md);
+    font-size: var(--text-xs);
+    color: var(--danger);
+    font-weight: var(--weight-semibold);
+}
+
+.budget-warning-banner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    background: var(--warning-bg);
+    border: 1px solid var(--warning-border);
+    border-radius: var(--radius-md);
+    font-size: var(--text-xs);
+    color: var(--warning);
+    font-weight: var(--weight-semibold);
+}

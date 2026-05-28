@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AitoolCor MoneyWise Dashboard - Manage your finances">
+    <meta name="theme-color" content="#6366F1">
+    <title>Dashboard — AitoolCor MoneyWise</title>
+
+    <!-- Favicon -->
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+    <!-- CSS - In Order -->
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/glass.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/charts.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/transactions.css">
+    <link rel="stylesheet" href="css/budgets.css">
+    <link rel="stylesheet" href="css/goals.css">
+    <link rel="stylesheet" href="css/bills.css">
+    <link rel="stylesheet" href="css/accounts.css">
+    <link rel="stylesheet" href="css/reports.css">
+    <link rel="stylesheet" href="css/analytics.css">
+    <link rel="stylesheet" href="css/settings.css">
+    <link rel="stylesheet" href="css/responsive.css">
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+</head>
+<body>
+
+<!-- ── GLASS BACKGROUND ── -->
+<div class="glass-bg-orbs">
+    <div class="glass-orb orb-1"></div>
+    <div class="glass-orb orb-2"></div>
+    <div class="glass-orb orb-3"></div>
+    <div class="glass-orb orb-4"></div>
+    <div class="glass-orb orb-5"></div>
+</div>
+<div class="glass-mesh-bg"></div>
+
+<!-- ── LOADER ── -->
+<div class="loader-screen" id="loaderScreen">
+    <div class="loader-content">
+        <div class="loader-icon-wrap loader-bounce">
+            <i class="fas fa-wallet"></i>
+        </div>
+        <div class="loader-title">AitoolCor <span>MoneyWise</span></div>
+        <div class="loader-bar-wrap">
+            <div class="loader-bar-fill loader-slide"></div>
+        </div>
+        <p class="loader-text">Loading your dashboard...</p>
+    </div>
+</div>
+
+<!-- ── TOAST ── -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ── SIDEBAR OVERLAY (mobile) ── -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- ── APP WRAPPER ── -->
+<div class="app-wrapper">
+
+    <!-- ════════════════════════════════
+         SIDEBAR
+    ════════════════════════════════ -->
+    <aside class="sidebar" id="sidebar">
+
+        <!-- Header -->
+        <div class="sidebar-header">
+            <div class="sidebar-logo-icon">
+                <i class="fas fa-wallet"></i>
+            </div>
+            <div class="sidebar-logo-text">
+                <span class="sidebar-logo-brand">AitoolCor</span>
+                <span class="sidebar-logo-name">MoneyWise</span>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="sidebar-nav">
+
+            <!-- Main -->
+            <div class="nav-section">
+                <div class="nav-section-title">Main</div>
+
+                <div class="nav-item active" data-page="dashboard">
+                    <span class="nav-item-icon"><i class="fas fa-th-large"></i></span>
+                    <span class="nav-item-label">Dashboard</span>
+                </div>
+
+                <div class="nav-item" data-page="transactions">
+                    <span class="nav-item-icon"><i class="fas fa-exchange-alt"></i></span>
+                    <span class="nav-item-label">Transactions</span>
+                    <span class="nav-item-badge" id="txNavBadge">0</span>
+                </div>
+
+                <div class="nav-item" data-page="accounts">
+                    <span class="nav-item-icon"><i class="fas fa-university"></i></span>
+                    <span class="nav-item-label">Accounts</span>
+                </div>
+            </div>
+
+            <!-- Planning -->
+            <div class="nav-section">
+                <div class="nav-section-title">Planning</div>
+
+                <div class="nav-item" data-page="budgets">
+                    <span class="nav-item-icon"><i class="fas fa-chart-pie"></i></span>
+                    <span class="nav-item-label">Budgets</span>
+                </div>
+
+                <div class="nav-item" data-page="goals">
+                    <span class="nav-item-icon"><i class="fas fa-bullseye"></i></span>
+                    <span class="nav-item-label">Goals</span>
+                </div>
+
+                <div class="nav-item" data-page="bills">
+                    <span class="nav-item-icon"><i class="fas fa-file-invoice-dollar"></i></span>
+                    <span class="nav-item-label">Bills</span>
+                    <span class="nav-item-badge" id="billsNavBadge" style="display:none;"></span>
+                </div>
+            </div>
+
+            <!-- Insights -->
+            <div class="nav-section">
+                <div class="nav-section-title">Insights</div>
+
+                <div class="nav-item" data-page="reports">
+                    <span class="nav-item-icon"><i class="fas fa-chart-bar"></i></span>
+                    <span class="nav-item-label">Reports</span>
+                </div>
+
+                <div class="nav-item" data-page="analytics">
+                    <span class="nav-item-icon"><i class="fas fa-brain"></i></span>
+                    <span class="nav-item-label">Analytics</span>
+                </div>
+            </div>
+
+            <!-- System -->
+            <div class="nav-section">
+                <div class="nav-section-title">System</div>
+
+                <div class="nav-item" data-page="settings">
+                    <span class="nav-item-icon"><i class="fas fa-cog"></i></span>
+                    <span class="nav-item-label">Settings</span>
+                </div>
+
+                <div class="nav-item" id="logoutNavItem">
+                    <span class="nav-item-icon"><i class="fas fa-sign-out-alt"></i></span>
+                    <span class="nav-item-label">Logout</span>
+                </div>
+            </div>
+
+        </nav>
+
+        <!-- Footer - User Profile -->
+        <div class="sidebar-footer">
+            <div class="sidebar-divider"></div>
+            <div class="sidebar-user" onclick="navigateTo('settings')">
+                <div class="sidebar-user-avatar" id="sidebarAvatar">U</div>
+                <div class="sidebar-user-info">
+                    <div class="sidebar-user-name" id="sidebarUserName">User</div>
+                    <div class="sidebar-user-role" id="sidebarUserRole">Free Account</div>
+                </div>
+                <i class="fas fa-ellipsis-v sidebar-user-more"></i>
+            </div>
+        </div>
+
+    </aside>
+    <!-- END SIDEBAR -->
+
+    <!-- ════════════════════════════════
+         MAIN WRAPPER
+    ════════════════════════════════ -->
+    <div class="main-wrapper">
+
+        <!-- ── TOP BAR ── -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <!-- Mobile Menu Toggle -->
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+
+                <!-- Page Title -->
+                <div class="topbar-breadcrumb">
+                    <div class="topbar-page-title" id="topbarTitle">Dashboard</div>
+                    <div class="topbar-page-sub" id="topbarSub">Welcome back!</div>
+                </div>
+
+                <!-- Search -->
+                <div class="topbar-search">
+                    <input
+                        type="text"
+                        placeholder="Search transactions... (Ctrl+K)"
+                        id="globalSearch"
+                        autocomplete="off"
+                    >
+                    <i class="fas fa-search topbar-search-icon"></i>
+                </div>
+            </div>
+
+            <div class="topbar-right">
+                <!-- Currency -->
+                <div class="topbar-currency" id="topbarCurrency">
+                    <span id="currencyFlag">🇺🇸</span>
+                    <span id="currencyCode">USD</span>
+                    <i class="fas fa-chevron-down" style="font-size:0.65rem;opacity:0.6;"></i>
+                </div>
+
+                <!-- Notifications -->
+                <button class="topbar-btn" id="notifBtn" title="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="notif-badge" id="notifCount" style="display:none;">0</span>
+                </button>
+
+                <!-- Export -->
+                <button class="topbar-btn" id="exportBtn" title="Export Data">
+                    <i class="fas fa-download"></i>
+                </button>
+
+                <!-- Quick Add -->
+                <button class="topbar-quick-add" id="quickAddBtn">
+                    <i class="fas fa-plus"></i>
+                    <span class="btn-label">Add Transaction</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- ── NOTIFICATION PANEL ── -->
+        <div class="notif-panel" id="notifPanel">
+            <div class="notif-panel-header">
+                <h4>🔔 Notifications</h4>
+                <button onclick="clearNotifications()">Mark all read</button>
+            </div>
+            <div class="notif-panel-body" id="notifList">
+                <!-- Generated by JS -->
+            </div>
+            <div class="notif-panel-footer">
+                <button onclick="closeNotifPanel()">Close</button>
+            </div>
+        </div>
+
+        <!-- ── PAGE AREA ── -->
+        <div class="page-area">
+
+            <!-- ════════════ DASHBOARD PAGE ════════════ -->
+            <div class="page active" id="page-dashboard">
+
+                <!-- Welcome Row -->
+                <div class="pg-header">
+                    <div class="pg-header-left">
+                        <h2 class="pg-title">
+                            Good <span id="timeGreeting">morning</span>,
+                            <span class="gradient-text" id="dashUserName">User</span>! 👋
+                        </h2>
+                        <p class="pg-subtitle">
+                            Here's your financial overview for
+                            <span id="currentMonthYear"></span>
+                        </p>
+                    </div>
+                    <div class="pg-actions">
+                        <div class="chart-period-tabs" id="dashPeriodTabs">
+                            <button class="period-tab active" data-period="monthly">This Month</button>
+                            <button class="period-tab" data-period="yearly">This Year</button>
+                            <button class="period-tab" data-period="all">All Time</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Overview Cards -->
+                <div class="layout-grid-4" id="overviewCards">
+                    <!-- Rendered by dashboard.js -->
+                </div>
+
+                <!-- Charts Row -->
+                <div class="layout-grid-3-2">
+                    <!-- Bar Chart -->
+                    <div class="card glass-hover" id="barChartCard">
+                        <div class="card-header">
+                            <h3>
+                                <i class="fas fa-chart-bar" style="color:var(--primary)"></i>
+                                Income vs Expenses
+                            </h3>
+                            <div class="chart-tabs" id="barChartTabs">
+                                <button class="chart-tab active" data-period="weekly">Week</button>
+                                <button class="chart-tab" data-period="monthly">Month</button>
+                                <button class="chart-tab" data-period="yearly">Year</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="bar-chart-wrap" id="mainBarChart">
+                                <!-- Rendered by charts.js -->
+                            </div>
+                            <div class="chart-legend">
+                                <div class="legend-item">
+                                    <span class="legend-dot success"></span>
+                                    <span>Income</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="legend-dot danger"></span>
+                                    <span>Expenses</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Donut Chart -->
+                    <div class="card glass-hover" id="donutChartCard">
+                        <div class="card-header">
+                            <h3>
+                                <i class="fas fa-chart-pie" style="color:var(--secondary)"></i>
+                                Spending Breakdown
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div id="donutChart">
+                                <!-- Rendered by charts.js -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Row -->
+                <div class="layout-grid-2-1">
+                    <!-- Recent Transactions -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>
+                                <i class="fas fa-history" style="color:var(--info)"></i>
+                                Recent Transactions
+                            </h3>
+                            <button class="btn btn-sm btn-secondary" onclick="navigateTo('transactions')">
+                                View All <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                        <div class="card-body" style="padding:0;">
+                            <div id="recentTxList">
+                                <!-- Rendered by dashboard.js -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Budget Summary -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>
+                                <i class="fas fa-bullseye" style="color:var(--warning)"></i>
+                                Budget Status
+                            </h3>
+                            <button class="btn btn-sm btn-secondary" onclick="navigateTo('budgets')">
+                                Manage
+                            </button>
+                        </div>
+                        <div class="card-body" id="dashBudgetList">
+                            <!-- Rendered by dashboard.js -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Info Row -->
+                <div class="layout-grid-3">
+                    <!-- Goals Summary -->
+                    <div class="card glass-hover">
+                        <div class="card-header">
+                            <h3>
+                                <i class="fas fa-flag" style="color:var(--success)"></i>
+                                Goals Progress
+                            </h3>
+                            <button class="btn btn-sm btn-secondary" onclick="navigateTo('goals')">
+                                View
+                            </button>
+                        </div>
+                        <div class="card-body" id="dashGoalsList">
+                            <!-- Rendered by dashboard.js -->
+                        </div>
+                    </div>
+
+                    <!-- Upcoming Bills -->
+                    <div class="card glass-hover">
+                        <div class="card-header">
+                            <h3>
+                                <i class="fas fa-calendar-alt" style="color:var(--danger)"></i>
+                                Upcoming Bills
+                            </h3>
+                            <button class="btn btn-sm btn-secondary" onclick="navigateTo('bills')">
+                                View
+                            </button>
+                        </div>
+                        <div class="card-body" id="dashBillsList">
+                            <!-- Rendered by dashboard.js -->
+                        </div>
+                    </div>
+
+                    <!-- Financial Health -->
+                    <div class="card glass-hover">
+                        <div class="card-header">
+                            <h3>
+                                <i class="fas fa-heartbeat" style="color:var(--danger)"></i>
+                                Financial Health
+                            </h3>
+                        </div>
+                        <div class="card-body" id="dashHealthScore">
+                            <!-- Rendered by dashboard.js -->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- END DASHBOARD -->
+
+            <!-- ════════════ TRANSACTIONS PAGE ════════════ -->
+            <div class="page" id="page-transactions">
+                <div class="pg-header">
+                    <div class="pg-header-left">
+                        <h2 class="pg-title">💳 Transactions</h2>
+                        <p class="pg-subtitle">Track all your income and expenses</p>
+                    </div>
+                    <div class="pg-actions">
+                        <button class="btn btn-secondary btn-sm" onclick="exportCSV()">
+                            <i class="fas fa-file-csv"></i> CSV
+                        </button>
+                        <button class="btn btn-secondary btn-sm" onclick="exportJSON()">
+                            <i class="fas fa-file-code"></i> JSON
+                        </button>
+                        <button class="btn btn-primary btn-sm" onclick="openTxModal()">
+                            <i class="fas fa-plus"></i> Add
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Summary Bar -->
+                <div class="tx-summary-bar" id="txSummaryBar">
+                    <!-- Rendered by transactions.js -->
+                </div>
+
+                <!-- Filter Bar -->
+                <div class="filter-bar">
+                    <select class="filter-select" id="filterType" onchange="renderTransactions()">
+                        <option value="all">All Types</option>
+                        <option value="income">Income</option>
+                        <option value="expense">Expense</option>
+                    </select>
+
+                    <select class="filter-select" id="filterCategory" onchange="renderTransactions()">
+                        <option value="all">All Categories</option>
+                    </select>
+
+                    <select class="filter-select" id="filterAccount" onchange="renderTransactions()">
+                        <option value="all">All Accounts</option>
+                    </select>
+
+                    <input type="date" class="filter-input" id="filterFrom" onchange="renderTransactions()" placeholder="From">
+                    <input type="date" class="filter-input" id="filterTo" onchange="renderTransactions()" placeholder="To">
+
+                    <select class="filter-select" id="filterSort" onchange="renderTransactions()">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="highest">Highest Amount</option>
+                        <option value="lowest">Lowest Amount</option>
+                    </select>
+
+                    <button class="btn btn-sm btn-secondary" onclick="clearFilters()">
+                        <i class="fas fa-times"></i> Clear
+                    </button>
+                </div>
+
+                <!-- Transaction List -->
+                <div class="card">
+                    <div class="card-body" style="padding: 0;">
+                        <div id="txList">
+                            <!-- Rendered by transactions.js -->
+                        </div>
+                        <div class="pagination" id="txPagination"></div>
+                    </div>
+                </div>
+            </div>
+            <!-- END TRANSACTIONS -->
+
+            <!-- ════════════ ACCOUNTS PAGE ════════════ -->
+            <div class="page" id="page-accounts">
+                <div class="pg-header">
+                    <div class="pg-header-left">
+                        <h2 class="pg-title">🏦 Accounts</h2>
+                        <p class="pg-subtitle">Manage your bank accounts and wallets</p>
+                    </div>
+                    <div class="pg-actions">
+                        <button class="btn btn-primary btn-sm" onclick="openAccountModal()">
+                            <i class="fas fa-plus"></i> Add Account
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Net Worth Card -->
+                <div id="netWorthCard" class="mb-3"></div>
+
+                <!-- Accounts Grid -->
+                <div class="layout-grid-3" id="accountsGrid">
+                    <!-- Rendered by accounts.js -->
+                </div>
+            </div>
+            <!-- END ACCOUNTS -->
+
+            <!-- ════════════ BUDGETS PAGE ════════════ -->
+            <div class="page" id="page-budgets">
+                <div class="pg-header">
+                    <div class="pg-header-left">
+                        <h2 class="pg-title">📊 Budgets</h2>
+                        <p class="pg-subtitle">Set spending limits and track your progress</p>
+                    </div>
+                    <div class="pg-actions">
+                        <button class="btn btn-primary btn-sm" onclick="openBudgetModal()">
+                            <i class="fas fa-plus"></i> Add Budget
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Budget Overview -->
+                <div class="layout-grid-3" id="budgetOverviewCards">
+                    <!-- Rendered by budgets.js -->
+                </div>
+
+                <!-- Budget List -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-list" style="color:var(--primary)"></i> All Budgets</h3>
+                    </div>
+                    <div class="card-body" id="budgetList">
+                        <!-- Rendered by budgets.js -->
+                    </div>
+                </div>
+            </div>
+            <!-- END BUDGETS -->
+
+            <!-- ════════════ GOALS PAGE ════════════ -->
+            <div class="page" id="page-goals">
+                <div class="pg-header">
+                    <div class="pg-header-left">
+                        <h2 class="pg-title">🎯 Savings Goals</h2>
+                        <p class="pg-subtitle">Track progress toward your financial dreams</p>
+                    </div>
+                </div>
+
+                <!-- Goals Grid -->
+                <div class="layout-grid-3" id="goalsGrid">
+                    <!-- Rendered by goals.js -->
+                </div>
+            </div>
+            <!-- END GOALS -->
+
+            <!-- ════════════ BILLS PAGE ════════════ -->
+            <div class="page" id="page-bills">
+                <div class="pg-header">
+                    <div class="pg-header-left">
+                        <h2 class="pg-title">📄 Bills & Subscriptions</h2>
+                        <p class="pg-subtitle">Track recurring bills and never miss a payment</p>
+                    </div>
+                    <div class="pg-actions">
+                        <button class="btn btn-primary btn-sm" onclick="openBillModal()">
+                            <i class="fas fa-plus"></i> Add Bill
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Bills Summary -->
+                <div class="layout-grid-4" id="billsSummaryCards">
+                    <!-- Rendered by bills.js -->
+                </div>
+
+                <!-- Bills List -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-list" style="color:var(--primary)"></i> All Bills</h3>
+                        <button class="btn btn-sm btn-secondary" onclick="resetAllBills()">
+                            <i class="fas fa-sync"></i> New Month
+                        </button>
+                    </div>
+                    <div class="card-body" style="padding:0;" id="billsList">
+                        <!-- Rendered by bills.js -->
+                    </div>
+                </div>
+            </div>
+            <!-- END BILLS -->
+
+            <!-- ════════════ REPORTS PAGE ════════════ -->
+            <div class="page" id="page-reports">
+                <div class="pg-header">
+                    <div class="pg-header-left">
+                        <h2 class="pg-title">📈 Financial Reports</h2>
+                        <p class="pg-subtitle">Detailed breakdown and monthly summaries</p>
+                    </div>
+                    <div class="pg-actions">
+                        <button class="btn btn-secondary btn-sm" onclick="printReport()">
+                            <i class="fas fa-print"></i> Print
+                        </button>
+                        <button class="btn btn-secondary btn-sm" onclick="exportAllData()">
+                            <i class="fas fa-download"></i> Export
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Report Cards -->
+                <div class="layout-grid-3" id="reportCards">
+                    <!-- Rendered by reports.js -->
+                </div>
+
+                <!-- Report Charts Row -->
+                <div class="layout-grid-2" style="margin-bottom:var(--space-6);">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-chart-bar" style="color:var(--primary)"></i> Monthly Comparison</h3>
+                        </div>
+                        <div class="card-body">
+                            <div id="reportBarChart"></div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-chart-pie" style="color:var(--secondary)"></i> Top Categories</h3>
+                        </div>
+                        <div class="card-body" id="reportCategoryList">
+                            <!-- Rendered by reports.js -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Monthly Summary Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-table" style="color:var(--info)"></i> Monthly Summary</h3>
+                    </div>
+                    <div class="card-body" style="padding:0;overflow-x:auto;">
+                        <table class="data-table" id="reportTable">
+                            <thead>
+                                <tr>
+                                    <th>Month</th>
+                                    <th>Income</th>
+                                    <th>Expenses</th>
+                                    <th>Savings</th>
+                                    <th>Savings Rate</th>
+                                    <th>Transactions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reportTableBody">
+                                <!-- Rendered by reports.js -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- END REPORTS -->
+
+            <!-- ════════════ ANALYTICS PAGE ════════════ -->
+            <div class="page" id="page-analytics">
+                <div class="pg-header">
+                    <div class="pg-header-left">
+                        <h2 class="pg-title">🧠 Analytics & Insights</h2>
+                        <p class="pg-subtitle">AI-powered insights about your financial habits</p>
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="layout-grid-4" id="analyticsStats">
+                    <!-- Rendered by analytics.js -->
+                </div>
+
+                <!-- Analytics Row 1 -->
+                <div class="layout-grid-2">
+                    <!-- Smart Tips -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-lightbulb" style="color:var(--warning)"></i> Smart Tips</h3>
+                            <span class="badge badge-primary">AI</span>
+                        </div>
+                        <div class="card-body" id="smartTips">
+                            <!-- Rendered by analytics.js -->
+                        </div>
+                    </div>
+
+                    <!-- Financial Health Score -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-heartbeat" style="color:var(--danger)"></i> Health Score</h3>
+                        </div>
+                        <div class="card-body" id="healthScoreCard">
+                            <!-- Rendered by analytics.js -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Row 2 -->
+                <div class="layout-grid-2">
+                    <!-- Daily Average Chart -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-calendar-day" style="color:var(--info)"></i> Daily Spending</h3>
+                        </div>
+                        <div class="card-body" id="dailySpendChart">
+                            <!-- Rendered by analytics.js -->
+                        </div>
+                    </div>
+
+                    <!-- Income Sources -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-coins" style="color:var(--success)"></i> Income Sources</h3>
+                        </div>
+                        <div class="card-body" id="incomeSources">
+                            <!-- Rendered by analytics.js -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Spending Trend -->
+                <div class="card" style="margin-bottom:var(--space-6);">
+                    <div class="card-header">
+                        <h3><i class="fas fa-chart-line" style="color:var(--primary)"></i> Spending Trend</h3>
+                    </div>
+                    <div class="card-body" id="spendingTrend">
+                        <!-- Rendered by analytics.js -->
+                    </div>
+                </div>
+
+            </div>
+            <!-- END ANALYTICS -->
+
+            <!-- ════════════ SETTINGS PAGE ════════════ -->
+            <div class="page" id="page-settings">
+                <div class="pg-header">
+                    <div class="pg-header-left">
+                        <h2 class="pg-title">⚙️ Settings</h2>
+                        <p class="pg-subtitle">Customize your MoneyWise experience</p>
+                    </div>
+                </div>
+
+                <div class="layout-grid-2">
+                    <!-- Profile Settings -->
+                    <div>
+                        <div class="card" style="margin-bottom:var(--space-5);">
+                            <div class="card-header">
+                                <h3><i class="fas fa-user" style="color:var(--primary)"></i> Profile</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="settings-profile-header" id="settingsProfileHeader">
+                                    <!-- Rendered by settings.js -->
+                                </div>
+                                <div class="form-grid" style="margin-top:var(--space-5);">
+                                    <div class="form-group">
+                                        <label class="form-label">Full Name</label>
+                                        <input type="text" class="form-control" id="settingName" placeholder="Your name">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Currency</label>
+                                        <select class="form-control" id="settingCurrency">
+                                            <option value="USD">🇺🇸 USD - US Dollar</option>
+                                            <option value="EUR">🇪🇺 EUR - Euro</option>
+                                            <option value="GBP">🇬🇧 GBP - British Pound</option>
+                                            <option value="INR">🇮🇳 INR - Indian Rupee</option>
+                                            <option value="JPY">🇯🇵 JPY - Japanese Yen</option>
+                                            <option value="CAD">🇨🇦 CAD - Canadian Dollar</option>
+                                            <option value="AUD">🇦🇺 AUD - Australian Dollar</option>
+                                            <option value="CHF">🇨🇭 CHF - Swiss Franc</option>
+                                            <option value="CNY">🇨🇳 CNY - Chinese Yuan</option>
+                                            <option value="BRL">🇧🇷 BRL - Brazilian Real</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-span-2">
+                                        <button class="btn btn-primary btn-block" onclick="saveSettings()">
+                                            <i class="fas fa-save"></i> Save Settings
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notifications -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-bell" style="color:var(--warning)"></i> Notifications</h3>
+                            </div>
+                            <div class="card-body" id="notifSettings">
+                                <!-- Rendered by settings.js -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data Management -->
+                    <div>
+                        <div class="card" style="margin-bottom:var(--space-5);">
+                            <div class="card-header">
+                                <h3><i class="fas fa-database" style="color:var(--info)"></i> Data Management</h3>
+                            </div>
+                            <div class="card-body" id="dataManagement">
+                                <!-- Rendered by settings.js -->
+                            </div>
+                        </div>
+
+                        <!-- About -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-info-circle" style="color:var(--primary)"></i> About</h3>
+                            </div>
+                            <div class="card-body" id="aboutSection">
+                                <!-- Rendered by settings.js -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- END SETTINGS -->
+
+        </div>
+        <!-- END PAGE AREA -->
+
+    </div>
+    <!-- END MAIN WRAPPER -->
+
+</div>
+<!-- END APP WRAPPER -->
+
+<!-- ════════════════════════════════
+     MODALS
+════════════════════════════════ -->
+
+<!-- ── ADD/EDIT TRANSACTION MODAL ── -->
+<div class="modal-overlay" id="txModal">
+    <div class="modal-backdrop" onclick="closeModal('txModal')"></div>
+    <div class="modal">
+        <div class="modal-header">
+            <h3 id="txModalTitle">➕ Add Transaction</h3>
+            <button class="modal-close" onclick="closeModal('txModal')">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <!-- Type Toggle -->
+            <div class="form-group" style="margin-bottom:var(--space-5);">
+                <label class="form-label">Type</label>
+                <div class="type-toggle">
+                    <button class="type-btn income active" id="typeIncome" onclick="setTxType('income')">
+                        <i class="fas fa-arrow-down"></i> Income
+                    </button>
+                    <button class="type-btn expense" id="typeExpense" onclick="setTxType('expense')">
+                        <i class="fas fa-arrow-up"></i> Expense
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Amount <span class="required">*</span></label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" id="txAmount"
+                            placeholder="0.00" min="0.01" step="0.01" required>
+                        <i class="fas fa-dollar-sign input-icon"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Category <span class="required">*</span></label>
+                    <select class="form-control" id="txCategory" required></select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Date <span class="required">*</span></label>
+                    <input type="date" class="form-control" id="txDate" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Account</label>
+                    <select class="form-control" id="txAccount"></select>
+                </div>
+
+                <div class="form-group col-span-2">
+                    <label class="form-label">Description <span class="required">*</span></label>
+                    <input type="text" class="form-control" id="txDesc"
+                        placeholder="What was this for?" required>
+                </div>
+
+                <div class="form-group col-span-2">
+                    <label class="form-label">Notes</label>
+                    <textarea class="form-control" id="txNotes"
+                        placeholder="Additional notes..." rows="2"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('txModal')">Cancel</button>
+            <button class="btn btn-primary" id="txSaveBtn" onclick="saveTx()">
+                <i class="fas fa-check"></i> Save Transaction
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ── ADD BUDGET MODAL ── -->
+<div class="modal-overlay" id="budgetModal">
+    <div class="modal-backdrop" onclick="closeModal('budgetModal')"></div>
+    <div class="modal">
+        <div class="modal-header">
+            <h3>📊 Add Budget</h3>
+            <button class="modal-close" onclick="closeModal('budgetModal')">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <select class="form-control" id="budgetCategory"></select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Monthly Limit</label>
+                    <input type="number" class="form-control" id="budgetLimit"
+                        placeholder="0.00" min="1" step="0.01" required>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('budgetModal')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveBudget()">
+                <i class="fas fa-check"></i> Save Budget
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ── ADD GOAL MODAL ── -->
+<div class="modal-overlay" id="goalModal">
+    <div class="modal-backdrop" onclick="closeModal('goalModal')"></div>
+    <div class="modal">
+        <div class="modal-header">
+            <h3 id="goalModalTitle">🎯 Add Goal</h3>
+            <button class="modal-close" onclick="closeModal('goalModal')">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="form-grid">
+                <div class="form-group col-span-2">
+                    <label class="form-label">Goal Name <span class="required">*</span></label>
+                    <input type="text" class="form-control" id="goalName"
+                        placeholder="e.g., Emergency Fund, New Car..." required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Target Amount <span class="required">*</span></label>
+                    <input type="number" class="form-control" id="goalTarget"
+                        placeholder="0.00" min="1" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Saved So Far</label>
+                    <input type="number" class="form-control" id="goalSaved"
+                        placeholder="0.00" min="0" step="0.01" value="0">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Emoji Icon</label>
+                    <input type="text" class="form-control" id="goalEmoji"
+                        placeholder="🎯" maxlength="4" value="🎯">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Target Date</label>
+                    <input type="date" class="form-control" id="goalDeadline">
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('goalModal')">Cancel</button>
+            <button class="btn btn-primary" id="goalSaveBtn" onclick="saveGoal()">
+                <i class="fas fa-check"></i> Save Goal
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ── ADD BILL MODAL ── -->
+<div class="modal-overlay" id="billModal">
+    <div class="modal-backdrop" onclick="closeModal('billModal')"></div>
+    <div class="modal">
+        <div class="modal-header">
+            <h3>📄 Add Bill</h3>
+            <button class="modal-close" onclick="closeModal('billModal')">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Bill Name <span class="required">*</span></label>
+                    <input type="text" class="form-control" id="billName"
+                        placeholder="e.g., Netflix, Electricity..." required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Amount <span class="required">*</span></label>
+                    <input type="number" class="form-control" id="billAmount"
+                        placeholder="0.00" min="0.01" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Due Day (1-31) <span class="required">*</span></label>
+                    <input type="number" class="form-control" id="billDueDay"
+                        placeholder="15" min="1" max="31" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Emoji Icon</label>
+                    <input type="text" class="form-control" id="billEmoji"
+                        placeholder="📄" maxlength="4" value="📄">
+                </div>
+                <div class="form-group col-span-2">
+                    <label class="form-label">Category</label>
+                    <select class="form-control" id="billCategory">
+                        <option value="bills">Bills & Utilities</option>
+                        <option value="subscriptions">Subscriptions</option>
+                        <option value="housing">Rent/Housing</option>
+                        <option value="health">Health & Insurance</option>
+                        <option value="other_expense">Other</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('billModal')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveBill()">
+                <i class="fas fa-check"></i> Save Bill
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ── ADD ACCOUNT MODAL ── -->
+<div class="modal-overlay" id="accountModal">
+    <div class="modal-backdrop" onclick="closeModal('accountModal')"></div>
+    <div class="modal">
+        <div class="modal-header">
+            <h3>🏦 Add Account</h3>
+            <button class="modal-close" onclick="closeModal('accountModal')">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Account Name <span class="required">*</span></label>
+                    <input type="text" class="form-control" id="accountName"
+                        placeholder="e.g., Main Bank, Cash..." required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Account Type</label>
+                    <select class="form-control" id="accountType">
+                        <option value="bank">🏦 Bank Account</option>
+                        <option value="cash">💵 Cash Wallet</option>
+                        <option value="credit">💳 Credit Card</option>
+                        <option value="savings">🏛️ Savings Account</option>
+                        <option value="investment">📈 Investment</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Current Balance <span class="required">*</span></label>
+                    <input type="number" class="form-control" id="accountBalance"
+                        placeholder="0.00" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Icon Emoji</label>
+                    <input type="text" class="form-control" id="accountEmoji"
+                        placeholder="🏦" maxlength="4" value="🏦">
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('accountModal')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveAccount()">
+                <i class="fas fa-check"></i> Save Account
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ── CONFIRM DELETE MODAL ── -->
+<div class="modal-overlay" id="confirmModal">
+    <div class="modal-backdrop" onclick="closeModal('confirmModal')"></div>
+    <div class="modal confirm-modal">
+        <div class="modal-body" style="padding: var(--space-8) var(--space-6);">
+            <div class="confirm-icon">🗑️</div>
+            <h3 class="confirm-title" id="confirmTitle">Delete Item?</h3>
+            <p class="confirm-desc" id="confirmDesc">This action cannot be undone.</p>
+        </div>
+        <div class="modal-footer" style="justify-content:center; gap:var(--space-4);">
+            <button class="btn btn-secondary" onclick="closeModal('confirmModal')">
+                Cancel
+            </button>
+            <button class="btn btn-danger" id="confirmActionBtn">
+                <i class="fas fa-trash"></i> Delete
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ── ADD FUNDS TO GOAL MODAL ── -->
+<div class="modal-overlay" id="addFundsModal">
+    <div class="modal-backdrop" onclick="closeModal('addFundsModal')"></div>
+    <div class="modal" style="max-width:380px;">
+        <div class="modal-header">
+            <h3>💰 Add Funds</h3>
+            <button class="modal-close" onclick="closeModal('addFundsModal')">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <p id="addFundsGoalName" style="font-weight:600;margin-bottom:var(--space-4);"></p>
+            <div class="form-group">
+                <label class="form-label">Amount to Add</label>
+                <input type="number" class="form-control" id="addFundsAmount"
+                    placeholder="0.00" min="0.01" step="0.01">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('addFundsModal')">Cancel</button>
+            <button class="btn btn-success" onclick="confirmAddFunds()">
+                <i class="fas fa-plus"></i> Add Funds
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ── CURRENCY SELECTOR MODAL ── -->
+<div class="modal-overlay" id="currencyModal">
+    <div class="modal-backdrop" onclick="closeModal('currencyModal')"></div>
+    <div class="modal" style="max-width:380px;">
+        <div class="modal-header">
+            <h3>💱 Select Currency</h3>
+            <button class="modal-close" onclick="closeModal('currencyModal')">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div id="currencyList"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ── SCROLL TO TOP ── -->
+<button class="scroll-top-btn" id="scrollTopBtn">
+    <i class="fas fa-arrow-up"></i>
+</button>
+
+<!-- ════════════════════════════════
+     JAVASCRIPT - In Order
+════════════════════════════════ -->
+<script src="js/toast.js"></script>
+<script src="js/store.js"></script>
+<script src="js/categories.js"></script>
+<script src="js/currency.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/modal.js"></script>
+<script src="js/animations.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/transactions.js"></script>
+<script src="js/budgets.js"></script>
+<script src="js/goals.js"></script>
+<script src="js/bills.js"></script>
+<script src="js/accounts.js"></script>
+<script src="js/reports.js"></script>
+<script src="js/analytics.js"></script>
+<script src="js/settings.js"></script>
+<script src="js/export.js"></script>
+<script src="js/shortcuts.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>

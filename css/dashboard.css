@@ -1,0 +1,236 @@
+/* ============================================================
+   AITOOLCOR MONEYWISE - DASHBOARD STYLES
+   File: css/dashboard.css
+   ============================================================ */
+
+/* ══════════════════════════════════
+   STAT CARDS
+══════════════════════════════════ */
+.stat-card {
+    padding: var(--space-5);
+    border-radius: var(--radius-lg);
+    position: relative;
+    overflow: hidden;
+    cursor: default;
+}
+
+.stat-card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: var(--space-4);
+}
+
+.stat-card-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--text-lg);
+    flex-shrink: 0;
+}
+
+.stat-card-change {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-bold);
+}
+
+.stat-card-change.up {
+    background: var(--success-bg);
+    color: #047857;
+}
+
+.stat-card-change.down {
+    background: var(--danger-bg);
+    color: #B91C1C;
+}
+
+.stat-card-label {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    font-weight: var(--weight-medium);
+    margin-bottom: var(--space-1);
+}
+
+.stat-card-amount {
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-extrabold);
+    letter-spacing: var(--tracking-tight);
+    line-height: 1.1;
+}
+
+.stat-card-bar {
+    margin-top: var(--space-4);
+    height: 4px;
+    background: rgba(0,0,0,0.06);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.stat-card-bar-fill {
+    height: 100%;
+    border-radius: var(--radius-full);
+    transition: width 1s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* ══════════════════════════════════
+   DASHBOARD BUDGET ITEMS
+══════════════════════════════════ */
+.dash-budget-item {
+    padding: var(--space-4) 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.dash-budget-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.dash-budget-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-2);
+}
+
+.dash-budget-info {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.dash-budget-name {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: var(--text-secondary);
+}
+
+.dash-budget-amounts {
+    display: flex;
+    align-items: baseline;
+    gap: 3px;
+}
+
+.dash-budget-spent {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+}
+
+.dash-budget-limit {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+}
+
+.dash-budget-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: var(--space-2);
+}
+
+/* ══════════════════════════════════
+   DASHBOARD GOAL ITEMS
+══════════════════════════════════ */
+.dash-goal-item {
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--border-color);
+    transition: var(--transition-fast);
+}
+
+.dash-goal-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.dash-goal-item:hover {
+    transform: translateX(3px);
+}
+
+.dash-goal-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-2);
+}
+
+/* ══════════════════════════════════
+   DASHBOARD BILL ITEMS
+══════════════════════════════════ */
+.dash-bill-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--border-color);
+    transition: var(--transition-fast);
+}
+
+.dash-bill-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.dash-bill-item:hover {
+    transform: translateX(3px);
+}
+
+/* ══════════════════════════════════
+   TX ITEM ROW
+══════════════════════════════════ */
+.tx-item:last-child {
+    border-bottom: none !important;
+}
+
+.tx-item:hover {
+    background: rgba(99,102,241,0.03) !important;
+}
+
+/* ══════════════════════════════════
+   HEALTH FACTORS
+══════════════════════════════════ */
+.health-factors {
+    width: 100%;
+}
+
+.health-factor {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-2) 0;
+    border-bottom: 1px solid var(--border-color);
+    font-size: var(--text-xs);
+}
+
+.health-factor:last-child { border: none; }
+
+.health-factor-left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--text-secondary);
+}
+
+.health-factor-icon { font-size: var(--text-sm); }
+
+.health-factor-score {
+    font-weight: var(--weight-bold);
+    display: flex;
+    align-items: center;
+}
+
+/* ══════════════════════════════════
+   DONUT CHART IN DASHBOARD
+══════════════════════════════════ */
+#donutChart .donut-wrap {
+    flex-direction: column;
+}
+
+#donutChart .donut-chart-container {
+    margin: 0 auto;
+}
