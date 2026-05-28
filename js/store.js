@@ -1,63 +1,31 @@
 /* ============================================================
-   AITOOLCOR MONEYWISE - DATA STORE (UPDATED)
+   AITOOLCOR MONEYWISE - DATA STORE
    File: js/store.js
-   
-   ✅ Per-user data isolation (uid-based storage key)
-   ✅ Guest → loads dummy sample data
-   ✅ New Google/Email user → blank data with INR default
-   ✅ Returning user → loads their saved data
+   Description: Complete LocalStorage Data Manager
+   All CRUD operations for all entities
    ============================================================ */
 
-const APP_VERSION  = '2.1.0';
-const DATA_PREFIX  = 'aitoolcor_mw_data_';
+const APP_VERSION  = '2.0.0';
+const STORAGE_KEY  = 'aitoolcor_mw_data';
 const AUTH_KEY     = 'aitoolcor_mw_auth';
 const SESSION_KEY  = 'aitoolcor_mw_session';
-const UNDO_KEY     = 'aitoolcor_mw_undo';
 
+/* ════════════════════════════════════════════════
+   DATA STORE CLASS
+════════════════════════════════════════════════ */
 class DataStore {
 
     constructor() {
-        this.storageKey = this._getUserKey();
-        this.data       = this._load();
-        this.undoStack  = [];
+        this.data = this._load();
     }
 
-    /* ── Get user-specific storage key ── */
-    _getUserKey() {
-        try {
-            const auth = JSON.parse(localStorage.getItem(AUTH_KEY));
-            if (auth && auth.uid) {
-                return DATA_PREFIX + auth.uid;
-            }
-        } catch(e) {}
-        return DATA_PREFIX + 'default';
-    }
-
-    /* ── Check auth flags ── */
-    _getAuth() {
-        try {
-            return JSON.parse(localStorage.getItem(AUTH_KEY));
-        } catch(e) { return null; }
-    }
-
-    _isGuest() {
-        const auth = this._getAuth();
-        return auth?.isGuest === true;
-    }
-
-    _isNewUser() {
-        const auth = this._getAuth();
-        return auth?.isNewUser === true;
-    }
-
-    /* ── DEFAULT BLANK DATA (for new Google/Email users) ── */
-    _getBlankData() {
-        const auth = this._getAuth();
+    /* ── DEFAULT DATA TEMPLATE ── */
+    _getDefault() {
         return {
-            version:      APP_VERSION,
+            version:  APP_VERSION,
             settings: {
-                name:     auth?.name || 'User',
-                currency: 'INR',  // ✅ Default INR
+                name:         'User',
+                currency:     'USD',
                 notifications: {
                     budgetAlerts:  true,
                     billReminders: true,
@@ -69,116 +37,170 @@ class DataStore {
             accounts: [
                 {
                     id:        this._id(),
-                    name:      'Bank Account',
+                    name:      'Main Bank',
                     type:      'bank',
-                    balance:   0,
+                    balance:   5000,
                     emoji:     '🏦',
                     createdAt: new Date().toISOString()
                 },
                 {
                     id:        this._id(),
-                    name:      'Cash',
+                    name:      'Cash Wallet',
                     type:      'cash',
-                    balance:   0,
+                    balance:   500,
                     emoji:     '💵',
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id:        this._id(),
+                    name:      'Credit Card',
+                    type:      'credit',
+                    balance:   -200,
+                    emoji:     '💳',
                     createdAt: new Date().toISOString()
                 }
             ],
-            budgets:     [],
-            goals:       [],
-            bills:       [],
-            templates:   [], // ✅ Recurring templates
-            lastBackup:  null,
-            streak:      { count: 0, lastDate: null },
+            budgets: [
+                { id: this._id(), category: 'food',          limit: 500 },
+                { id: this._id(), category: 'transport',     limit: 200 },
+                { id: this._id(), category: 'shopping',      limit: 400 },
+                { id: this._id(), category: 'entertainment', limit: 150 },
+                { id: this._id(), category: 'bills',         limit: 300 }
+            ],
+            goals: [
+                {
+                    id:        this._id(),
+                    name:      'Emergency Fund',
+                    target:    10000,
+                    saved:     3500,
+                    emoji:     '🏦',
+                    deadline:  '2025-12-31',
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id:        this._id(),
+                    name:      'New Laptop',
+                    target:    1500,
+                    saved:     800,
+                    emoji:     '💻',
+                    deadline:  '2025-06-30',
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id:        this._id(),
+                    name:      'Vacation Trip',
+                    target:    3000,
+                    saved:     1200,
+                    emoji:     '✈️',
+                    deadline:  '2025-08-15',
+                    createdAt: new Date().toISOString()
+                }
+            ],
+            bills: [
+                { id: this._id(), name: 'Netflix',        amount: 15.99, dueDay: 15, emoji: '📺', category: 'subscriptions', paid: false },
+                { id: this._id(), name: 'Electricity',    amount: 120,   dueDay: 20, emoji: '⚡', category: 'bills',          paid: false },
+                { id: this._id(), name: 'Internet',       amount: 59.99, dueDay: 5,  emoji: '🌐', category: 'bills',          paid: true  },
+                { id: this._id(), name: 'Phone Bill',     amount: 45,    dueDay: 10, emoji: '📱', category: 'bills',          paid: false },
+                { id: this._id(), name: 'Spotify',        amount: 9.99,  dueDay: 22, emoji: '🎵', category: 'subscriptions', paid: false },
+                { id: this._id(), name: 'Gym Membership', amount: 30,    dueDay: 1,  emoji: '💪', category: 'health',         paid: true  }
+            ],
             createdAt:   new Date().toISOString(),
             lastUpdated: new Date().toISOString()
         };
     }
 
-    /* ── DEFAULT DUMMY DATA (for Guest users) ── */
-    _getDummyData() {
-        const data = {
-            ...this._getBlankData(),
-            settings: {
-                ...this._getBlankData().settings,
-                name: 'Guest User'
-            },
-            accounts: [
-                { id: this._id(), name: 'SBI Bank',    type: 'bank',   balance: 85000,  emoji: '🏦', createdAt: new Date().toISOString() },
-                { id: this._id(), name: 'Cash Wallet', type: 'cash',   balance: 3500,   emoji: '💵', createdAt: new Date().toISOString() },
-                { id: this._id(), name: 'Credit Card', type: 'credit', balance: -12000, emoji: '💳', createdAt: new Date().toISOString() },
-                { id: this._id(), name: 'PPF Savings', type: 'savings',balance: 150000, emoji: '🏛️', createdAt: new Date().toISOString() }
-            ],
-            budgets: [
-                { id: this._id(), category: 'food',          limit: 8000  },
-                { id: this._id(), category: 'transport',     limit: 3000  },
-                { id: this._id(), category: 'shopping',      limit: 5000  },
-                { id: this._id(), category: 'entertainment', limit: 2000  },
-                { id: this._id(), category: 'bills',         limit: 5000  },
-                { id: this._id(), category: 'health',        limit: 3000  }
-            ],
-            goals: [
-                { id: this._id(), name: 'Emergency Fund',    target: 200000, saved: 85000,  emoji: '🏦', deadline: '2025-12-31', createdAt: new Date().toISOString() },
-                { id: this._id(), name: 'New iPhone',        target: 80000,  saved: 35000,  emoji: '📱', deadline: '2025-08-15', createdAt: new Date().toISOString() },
-                { id: this._id(), name: 'Goa Trip',          target: 50000,  saved: 22000,  emoji: '🏖️', deadline: '2025-06-30', createdAt: new Date().toISOString() },
-                { id: this._id(), name: 'Laptop Upgrade',    target: 70000,  saved: 45000,  emoji: '💻', deadline: '2025-09-01', createdAt: new Date().toISOString() }
-            ],
-            bills: [
-                { id: this._id(), name: 'Netflix',          amount: 649,   dueDay: 15, emoji: '📺', category: 'subscriptions', paid: false },
-                { id: this._id(), name: 'Electricity Bill',  amount: 2500,  dueDay: 20, emoji: '⚡', category: 'bills',          paid: false },
-                { id: this._id(), name: 'WiFi (Jio Fiber)',  amount: 999,   dueDay: 5,  emoji: '🌐', category: 'bills',          paid: true  },
-                { id: this._id(), name: 'Mobile Recharge',   amount: 599,   dueDay: 10, emoji: '📱', category: 'bills',          paid: false },
-                { id: this._id(), name: 'Spotify',           amount: 119,   dueDay: 22, emoji: '🎵', category: 'subscriptions', paid: false },
-                { id: this._id(), name: 'Gym Membership',    amount: 1500,  dueDay: 1,  emoji: '💪', category: 'health',         paid: true  },
-                { id: this._id(), name: 'Rent',              amount: 15000, dueDay: 1,  emoji: '🏠', category: 'housing',        paid: true  },
-                { id: this._id(), name: 'Amazon Prime',      amount: 1499,  dueDay: 25, emoji: '📦', category: 'subscriptions', paid: false }
-            ],
-            templates: [
-                { name: 'Monthly Salary',  type: 'income',  amount: 45000, category: 'salary',    description: 'Monthly Salary' },
-                { name: 'Rent Payment',    type: 'expense', amount: 15000, category: 'housing',   description: 'Monthly Rent' },
-                { name: 'Grocery',         type: 'expense', amount: 3000,  category: 'food',      description: 'Monthly Grocery' },
-                { name: 'Petrol',          type: 'expense', amount: 2000,  category: 'transport', description: 'Petrol Fill-up' }
-            ]
-        };
+    /* ── GENERATE UNIQUE ID ── */
+    _id() {
+        return Date.now().toString(36) +
+               Math.random().toString(36).substr(2, 7);
+    }
 
-        // Generate realistic INR sample transactions
+    /* ── DATE OFFSET HELPER ── */
+    _dateOffset(days) {
+        const d = new Date();
+        d.setDate(d.getDate() + days);
+        return d.toISOString().split('T')[0];
+    }
+
+    /* ── LOAD DATA ── */
+    _load() {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (parsed && Array.isArray(parsed.transactions)) {
+                    return this._migrate(parsed);
+                }
+            }
+        } catch (e) {
+            console.warn('Store: Failed to load data', e);
+        }
+        return this._initWithSampleData();
+    }
+
+    /* ── DATA MIGRATION (version upgrades) ── */
+    _migrate(data) {
+        // Ensure all required keys exist
+        if (!data.settings)      data.settings = this._getDefault().settings;
+        if (!data.accounts)      data.accounts = this._getDefault().accounts;
+        if (!data.budgets)       data.budgets  = this._getDefault().budgets;
+        if (!data.goals)         data.goals    = this._getDefault().goals;
+        if (!data.bills)         data.bills    = this._getDefault().bills;
+
+        // Ensure settings sub-keys
+        if (!data.settings.notifications) {
+            data.settings.notifications = this._getDefault().settings.notifications;
+        }
+
+        // Ensure each transaction has required fields
+        data.transactions = data.transactions.map(t => ({
+            notes:     '',
+            tags:      [],
+            ...t
+        }));
+
+        data.version = APP_VERSION;
+        return data;
+    }
+
+    /* ── INIT WITH SAMPLE DATA ── */
+    _initWithSampleData() {
+        const data = this._getDefault();
         const acc0 = data.accounts[0].id;
         const acc1 = data.accounts[1].id;
         const acc2 = data.accounts[2].id;
 
         const samples = [
             // Income
-            { type:'income',  amount:45000,  category:'salary',       description:'Monthly Salary',             daysAgo:1,  acc:acc0 },
-            { type:'income',  amount:12000,  category:'freelance',    description:'Web Development Project',    daysAgo:5,  acc:acc0 },
-            { type:'income',  amount:5000,   category:'freelance',    description:'Logo Design Work',           daysAgo:10, acc:acc0 },
-            { type:'income',  amount:2500,   category:'investment',   description:'Mutual Fund Dividend',       daysAgo:15, acc:acc0 },
-            { type:'income',  amount:8000,   category:'freelance',    description:'App UI Design',              daysAgo:18, acc:acc0 },
-            { type:'income',  amount:42000,  category:'salary',       description:'Monthly Salary',             daysAgo:32, acc:acc0 },
-            { type:'income',  amount:3000,   category:'gift_income',  description:'Birthday Gift from Uncle',   daysAgo:22, acc:acc1 },
+            { type:'income',  amount:4500,  category:'salary',        description:'Monthly Salary',         daysAgo:1,  account:acc0 },
+            { type:'income',  amount:1200,  category:'freelance',     description:'Web Dev Project',        daysAgo:4,  account:acc0 },
+            { type:'income',  amount:500,   category:'freelance',     description:'Logo Design',            daysAgo:8,  account:acc0 },
+            { type:'income',  amount:200,   category:'investment',    description:'Dividend Income',        daysAgo:12, account:acc0 },
+            { type:'income',  amount:800,   category:'freelance',     description:'Content Writing',        daysAgo:15, account:acc0 },
+            { type:'income',  amount:3800,  category:'salary',        description:'Monthly Salary',         daysAgo:32, account:acc0 },
+            { type:'income',  amount:650,   category:'freelance',     description:'App Development',        daysAgo:28, account:acc0 },
+            { type:'income',  amount:100,   category:'gift_income',   description:'Birthday Gift',          daysAgo:20, account:acc1 },
             // Expenses
-            { type:'expense', amount:850,    category:'food',         description:'Grocery - Big Bazaar',       daysAgo:1,  acc:acc0 },
-            { type:'expense', amount:250,    category:'food',         description:'Swiggy Order - Pizza',       daysAgo:2,  acc:acc1 },
-            { type:'expense', amount:1500,   category:'transport',    description:'Petrol Fill-up',             daysAgo:3,  acc:acc0 },
-            { type:'expense', amount:3500,   category:'shopping',     description:'Amazon - Headphones',        daysAgo:4,  acc:acc2 },
-            { type:'expense', amount:2500,   category:'bills',        description:'Electricity Bill',           daysAgo:5,  acc:acc0 },
-            { type:'expense', amount:450,    category:'entertainment',description:'Movie - PVR Cinemas',       daysAgo:6,  acc:acc1 },
-            { type:'expense', amount:1200,   category:'health',       description:'Doctor Consultation',        daysAgo:7,  acc:acc0 },
-            { type:'expense', amount:2000,   category:'education',    description:'Udemy Course - React',       daysAgo:8,  acc:acc2 },
-            { type:'expense', amount:150,    category:'food',         description:'Chai & Samosa',              daysAgo:2,  acc:acc1 },
-            { type:'expense', amount:649,    category:'subscriptions',description:'Netflix Subscription',       daysAgo:10, acc:acc0 },
-            { type:'expense', amount:119,    category:'subscriptions',description:'Spotify Premium',            daysAgo:10, acc:acc0 },
-            { type:'expense', amount:800,    category:'transport',    description:'Ola Rides',                  daysAgo:11, acc:acc1 },
-            { type:'expense', amount:2200,   category:'food',         description:'Restaurant - Family Dinner', daysAgo:12, acc:acc2 },
-            { type:'expense', amount:500,    category:'personal',     description:'Haircut',                    daysAgo:14, acc:acc1 },
-            { type:'expense', amount:4500,   category:'shopping',     description:'Myntra - Shoes',             daysAgo:16, acc:acc2 },
-            { type:'expense', amount:1000,   category:'gifts',        description:'Friend Birthday Gift',       daysAgo:19, acc:acc0 },
-            { type:'expense', amount:3200,   category:'food',         description:'Weekly Groceries',           daysAgo:21, acc:acc0 },
-            { type:'expense', amount:600,    category:'transport',    description:'Metro Card Recharge',        daysAgo:25, acc:acc1 },
-            { type:'expense', amount:5000,   category:'bills',        description:'Water & Gas Bill',           daysAgo:23, acc:acc0 },
-            { type:'expense', amount:15000,  category:'housing',      description:'Monthly Rent',               daysAgo:30, acc:acc0 },
-            { type:'expense', amount:350,    category:'food',         description:'Zomato - Biryani',           daysAgo:3,  acc:acc1 },
-            { type:'expense', amount:1800,   category:'health',       description:'Pharmacy - Medicines',       daysAgo:20, acc:acc0 },
-            { type:'expense', amount:4000,   category:'shopping',     description:'Croma - Power Bank',         daysAgo:28, acc:acc2 },
+            { type:'expense', amount:65,    category:'food',          description:'Grocery Shopping',       daysAgo:1,  account:acc0 },
+            { type:'expense', amount:35,    category:'transport',     description:'Uber Rides',             daysAgo:2,  account:acc1 },
+            { type:'expense', amount:120,   category:'shopping',      description:'New Headphones',         daysAgo:3,  account:acc2 },
+            { type:'expense', amount:89,    category:'bills',         description:'Electric Bill',          daysAgo:4,  account:acc0 },
+            { type:'expense', amount:45,    category:'entertainment', description:'Movie & Dinner',         daysAgo:5,  account:acc1 },
+            { type:'expense', amount:150,   category:'health',        description:'Doctor Visit',           daysAgo:6,  account:acc0 },
+            { type:'expense', amount:200,   category:'education',     description:'React Course',           daysAgo:9,  account:acc2 },
+            { type:'expense', amount:30,    category:'food',          description:'Pizza Order',            daysAgo:7,  account:acc1 },
+            { type:'expense', amount:15.99, category:'subscriptions', description:'Netflix Subscription',   daysAgo:10, account:acc0 },
+            { type:'expense', amount:9.99,  category:'subscriptions', description:'Spotify Premium',        daysAgo:10, account:acc0 },
+            { type:'expense', amount:55,    category:'transport',     description:'Gas Station Fill-up',    daysAgo:11, account:acc0 },
+            { type:'expense', amount:80,    category:'food',          description:'Restaurant Dinner',      daysAgo:13, account:acc2 },
+            { type:'expense', amount:40,    category:'personal',      description:'Haircut & Grooming',     daysAgo:14, account:acc1 },
+            { type:'expense', amount:250,   category:'shopping',      description:'New Running Shoes',      daysAgo:16, account:acc2 },
+            { type:'expense', amount:100,   category:'gifts',         description:'Birthday Gift',          daysAgo:18, account:acc0 },
+            { type:'expense', amount:95,    category:'food',          description:'Weekly Groceries',       daysAgo:20, account:acc0 },
+            { type:'expense', amount:60,    category:'transport',     description:'Monthly Bus Pass',       daysAgo:25, account:acc1 },
+            { type:'expense', amount:180,   category:'bills',         description:'Water & Gas Bill',       daysAgo:22, account:acc0 },
+            { type:'expense', amount:350,   category:'housing',       description:'Utilities & Maintenance',daysAgo:30, account:acc0 },
+            { type:'expense', amount:25,    category:'food',          description:'Coffee & Snacks',        daysAgo:2,  account:acc1 },
         ];
 
         data.transactions = samples.map(s => ({
@@ -188,98 +210,14 @@ class DataStore {
             category:    s.category,
             description: s.description,
             date:        this._dateOffset(-s.daysAgo),
-            account:     s.acc,
+            account:     s.account,
             notes:       '',
             tags:        [],
             createdAt:   new Date().toISOString()
         }));
 
-        return data;
-    }
-
-    /* ── LOAD DATA ── */
-    _load() {
-        // Try to load user-specific data
-        try {
-            const raw = localStorage.getItem(this.storageKey);
-            if (raw) {
-                const parsed = JSON.parse(raw);
-                if (parsed && Array.isArray(parsed.transactions)) {
-                    console.log('✅ Loaded saved data for user');
-                    return this._migrate(parsed);
-                }
-            }
-        } catch(e) {
-            console.warn('Store: load error', e);
-        }
-
-        // No existing data — decide blank vs dummy
-        const auth = this._getAuth();
-
-        if (auth?.isGuest) {
-            // Guest → dummy data
-            console.log('👻 Guest mode — loading sample data');
-            const data = this._getDummyData();
-            this._save(data);
-            return data;
-        }
-
-        if (auth?.isNewUser) {
-            // New Google/Email user → blank data
-            console.log('🆕 New user — creating blank data');
-            const data = this._getBlankData();
-            this._save(data);
-
-            // Mark as no longer new
-            if (typeof markUserAsReturning === 'function') {
-                markUserAsReturning();
-            }
-            return data;
-        }
-
-        // Fallback — blank data
-        console.log('📦 Fallback — blank data');
-        const data = this._getBlankData();
         this._save(data);
         return data;
-    }
-
-    /* ── DATA MIGRATION ── */
-    _migrate(data) {
-        if (!data.settings)       data.settings      = this._getBlankData().settings;
-        if (!data.accounts)       data.accounts      = [];
-        if (!data.budgets)        data.budgets       = [];
-        if (!data.goals)          data.goals         = [];
-        if (!data.bills)          data.bills         = [];
-        if (!data.templates)      data.templates     = [];
-        if (!data.streak)         data.streak        = { count: 0, lastDate: null };
-        if (!data.settings.notifications)
-            data.settings.notifications = this._getBlankData().settings.notifications;
-
-        // Default INR if not set
-        if (!data.settings.currency) data.settings.currency = 'INR';
-
-        data.transactions = data.transactions.map(t => ({
-            notes: '',
-            tags:  [],
-            ...t
-        }));
-
-        data.version = APP_VERSION;
-        return data;
-    }
-
-    /* ── GENERATE ID ── */
-    _id() {
-        return Date.now().toString(36) +
-               Math.random().toString(36).substr(2, 7);
-    }
-
-    /* ── DATE OFFSET ── */
-    _dateOffset(days) {
-        const d = new Date();
-        d.setDate(d.getDate() + days);
-        return d.toISOString().split('T')[0];
     }
 
     /* ── SAVE DATA ── */
@@ -287,68 +225,20 @@ class DataStore {
         data = data || this.data;
         data.lastUpdated = new Date().toISOString();
         try {
-            localStorage.setItem(this.storageKey, JSON.stringify(data));
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
         } catch(e) {
-            console.error('Store: save error', e);
-            // Storage full?
-            if (e.name === 'QuotaExceededError') {
-                Toast?.error('Storage full! Export and clear old data.');
-            }
+            console.error('Store: Failed to save data', e);
         }
     }
 
     save() { this._save(this.data); }
 
     /* ════════════════════════
-       UNDO SYSTEM
-    ════════════════════════ */
-    pushUndo(action, data) {
-        this.undoStack.push({ action, data, time: Date.now() });
-        // Keep only last 10
-        if (this.undoStack.length > 10) this.undoStack.shift();
-    }
-
-    undo() {
-        const last = this.undoStack.pop();
-        if (!last) return null;
-
-        switch(last.action) {
-            case 'delete_tx':
-                this.data.transactions.push(last.data);
-                // Restore account balance
-                const acc = this.data.accounts.find(a => a.id === last.data.account);
-                if (acc) {
-                    acc.balance += last.data.type === 'income'
-                        ? last.data.amount
-                        : -last.data.amount;
-                }
-                this.save();
-                return last;
-
-            case 'delete_budget':
-                this.data.budgets.push(last.data);
-                this.save();
-                return last;
-
-            case 'delete_goal':
-                this.data.goals.push(last.data);
-                this.save();
-                return last;
-
-            case 'delete_bill':
-                this.data.bills.push(last.data);
-                this.save();
-                return last;
-        }
-        return null;
-    }
-
-    /* ════════════════════════
        SETTINGS
     ════════════════════════ */
-    getSettings()  { return this.data.settings; }
-    getCurrency()  { return this.data.settings.currency || 'INR'; }
-    getUserName()  { return this.data.settings.name || 'User'; }
+    getSettings()           { return this.data.settings; }
+    getCurrency()           { return this.data.settings.currency || 'USD'; }
+    getUserName()           { return this.data.settings.name || 'User'; }
 
     updateSettings(updates) {
         Object.assign(this.data.settings, updates);
@@ -361,20 +251,23 @@ class DataStore {
     }
 
     /* ════════════════════════
-       TRANSACTIONS (enhanced)
+       TRANSACTIONS
     ════════════════════════ */
-    getTransactions()      { return this.data.transactions || []; }
-    getTransactionById(id) { return this.data.transactions.find(t => t.id === id); }
+    getTransactions()         { return this.data.transactions || []; }
+    getTransactionById(id)    { return this.data.transactions.find(t => t.id === id); }
 
     addTransaction(tx) {
         tx.id        = this._id();
         tx.createdAt = new Date().toISOString();
+
         this.data.transactions.push(tx);
 
+        // Update account balance
         const acc = this.data.accounts.find(a => a.id === tx.account);
-        if (acc) acc.balance += tx.type === 'income' ? tx.amount : -tx.amount;
+        if (acc) {
+            acc.balance += tx.type === 'income' ? tx.amount : -tx.amount;
+        }
 
-        this.updateStreak();
         this.save();
         return tx;
     }
@@ -382,18 +275,24 @@ class DataStore {
     updateTransaction(id, updates) {
         const idx = this.data.transactions.findIndex(t => t.id === id);
         if (idx === -1) return null;
+
         const old = this.data.transactions[idx];
 
-        // Reverse old
+        // Reverse old account effect
         const oldAcc = this.data.accounts.find(a => a.id === old.account);
-        if (oldAcc) oldAcc.balance += old.type === 'income' ? -old.amount : old.amount;
+        if (oldAcc) {
+            oldAcc.balance += old.type === 'income' ? -old.amount : old.amount;
+        }
 
+        // Apply updates
         this.data.transactions[idx] = { ...old, ...updates };
         const updated = this.data.transactions[idx];
 
-        // Apply new
+        // Apply new account effect
         const newAcc = this.data.accounts.find(a => a.id === updated.account);
-        if (newAcc) newAcc.balance += updated.type === 'income' ? updated.amount : -updated.amount;
+        if (newAcc) {
+            newAcc.balance += updated.type === 'income' ? updated.amount : -updated.amount;
+        }
 
         this.save();
         return updated;
@@ -403,179 +302,488 @@ class DataStore {
         const tx = this.data.transactions.find(t => t.id === id);
         if (!tx) return false;
 
-        // Undo support
-        this.pushUndo('delete_tx', { ...tx });
-
+        // Reverse account effect
         const acc = this.data.accounts.find(a => a.id === tx.account);
-        if (acc) acc.balance += tx.type === 'income' ? -tx.amount : tx.amount;
+        if (acc) {
+            acc.balance += tx.type === 'income' ? -tx.amount : tx.amount;
+        }
 
         this.data.transactions = this.data.transactions.filter(t => t.id !== id);
         this.save();
         return true;
     }
 
-    /* ── Duplicate transaction ── */
-    duplicateTransaction(id) {
-        const tx = this.getTransactionById(id);
-        if (!tx) return null;
+    /* ── Transaction Filters ── */
+    filterTransactions({
+        type     = 'all',
+        category = 'all',
+        account  = 'all',
+        from     = null,
+        to       = null,
+        sort     = 'newest',
+        search   = '',
+        month    = null,
+        year     = null
+    } = {}) {
+        let list = [...this.data.transactions];
 
-        const dup = {
-            ...tx,
-            id:          this._id(),
-            date:        new Date().toISOString().split('T')[0],
-            description: tx.description + ' (copy)',
-            createdAt:   new Date().toISOString()
-        };
+        if (type !== 'all')     list = list.filter(t => t.type === type);
+        if (category !== 'all') list = list.filter(t => t.category === category);
+        if (account !== 'all')  list = list.filter(t => t.account === account);
+        if (from)               list = list.filter(t => t.date >= from);
+        if (to)                 list = list.filter(t => t.date <= to);
 
-        this.data.transactions.push(dup);
+        if (month !== null && year !== null) {
+            list = list.filter(t => {
+                const d = new Date(t.date);
+                return d.getMonth() === month && d.getFullYear() === year;
+            });
+        }
 
-        const acc = this.data.accounts.find(a => a.id === dup.account);
-        if (acc) acc.balance += dup.type === 'income' ? dup.amount : -dup.amount;
+        if (search) {
+            const q = search.toLowerCase();
+            list = list.filter(t =>
+                t.description.toLowerCase().includes(q) ||
+                t.category.toLowerCase().includes(q) ||
+                (t.notes && t.notes.toLowerCase().includes(q))
+            );
+        }
 
-        this.save();
-        return dup;
+        switch(sort) {
+            case 'newest':  list.sort((a, b) => new Date(b.date) - new Date(a.date)); break;
+            case 'oldest':  list.sort((a, b) => new Date(a.date) - new Date(b.date)); break;
+            case 'highest': list.sort((a, b) => b.amount - a.amount); break;
+            case 'lowest':  list.sort((a, b) => a.amount - b.amount); break;
+        }
+
+        return list;
     }
 
-    /* ── Batch delete ── */
-    deleteTransactions(ids) {
-        ids.forEach(id => {
-            const tx = this.data.transactions.find(t => t.id === id);
-            if (tx) {
-                this.pushUndo('delete_tx', { ...tx });
-                const acc = this.data.accounts.find(a => a.id === tx.account);
-                if (acc) acc.balance += tx.type === 'income' ? -tx.amount : tx.amount;
+    /* ════════════════════════
+       STATISTICS
+    ════════════════════════ */
+    getMonthStats(month, year) {
+        const now   = new Date();
+        const m     = month !== undefined ? month : now.getMonth();
+        const y     = year  !== undefined ? year  : now.getFullYear();
+
+        const monthTx = this.data.transactions.filter(t => {
+            const d = new Date(t.date);
+            return d.getMonth() === m && d.getFullYear() === y;
+        });
+
+        const income  = monthTx.filter(t => t.type === 'income')
+                                .reduce((s, t) => s + t.amount, 0);
+        const expense = monthTx.filter(t => t.type === 'expense')
+                                .reduce((s, t) => s + t.amount, 0);
+        const balance = this.data.accounts.reduce((s, a) => s + a.balance, 0);
+        const savings = income - expense;
+        const rate    = income > 0 ? Math.round((savings / income) * 100) : 0;
+
+        return {
+            income, expense, balance, savings,
+            savingsRate: rate,
+            txCount: monthTx.length,
+            monthTx
+        };
+    }
+
+    getAllTimeStats() {
+        const all     = this.data.transactions;
+        const income  = all.filter(t => t.type === 'income') .reduce((s,t) => s+t.amount, 0);
+        const expense = all.filter(t => t.type === 'expense').reduce((s,t) => s+t.amount, 0);
+        const balance = this.data.accounts.reduce((s, a) => s + a.balance, 0);
+        return { income, expense, balance, savings: income - expense, txCount: all.length };
+    }
+
+    getYearStats(year) {
+        const y      = year || new Date().getFullYear();
+        const yearTx = this.data.transactions.filter(t => new Date(t.date).getFullYear() === y);
+        const income  = yearTx.filter(t => t.type === 'income') .reduce((s,t) => s+t.amount, 0);
+        const expense = yearTx.filter(t => t.type === 'expense').reduce((s,t) => s+t.amount, 0);
+        const balance = this.data.accounts.reduce((s, a) => s + a.balance, 0);
+        return { income, expense, balance, savings: income - expense, txCount: yearTx.length };
+    }
+
+    getCategoryBreakdown(type = 'expense', month, year) {
+        const { monthTx } = this.getMonthStats(month, year);
+        const filtered    = monthTx.filter(t => t.type === type);
+        const map         = {};
+
+        filtered.forEach(t => {
+            map[t.category] = (map[t.category] || 0) + t.amount;
+        });
+
+        return Object.entries(map)
+            .sort((a, b) => b[1] - a[1])
+            .map(([category, amount]) => ({
+                category,
+                amount,
+                info: this.getCategoryInfo(category)
+            }));
+    }
+
+    getCategoryInfo(id) {
+        const all = [
+            ...(typeof CATEGORIES !== 'undefined'
+                ? [...CATEGORIES.income, ...CATEGORIES.expense]
+                : [])
+        ];
+        return all.find(c => c.id === id) || {
+            id, name: id, icon: 'fa-circle', emoji: '📦', color: '#94A3B8'
+        };
+    }
+
+    getWeeklyData() {
+        const now         = new Date();
+        const startOfWeek = new Date(now);
+        const day         = now.getDay();
+        const diff        = day === 0 ? -6 : 1 - day; // Monday start
+        startOfWeek.setDate(now.getDate() + diff);
+        startOfWeek.setHours(0, 0, 0, 0);
+
+        const labels  = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+        const income  = Array(7).fill(0);
+        const expense = Array(7).fill(0);
+
+        this.data.transactions.forEach(t => {
+            const d    = new Date(t.date);
+            const diff = Math.floor((d - startOfWeek) / 86400000);
+            if (diff >= 0 && diff < 7) {
+                if (t.type === 'income')  income[diff]  += t.amount;
+                else                       expense[diff] += t.amount;
             }
         });
-        this.data.transactions = this.data.transactions.filter(t => !ids.includes(t.id));
+
+        return { labels, income, expense };
+    }
+
+    getMonthlyData(count = 6) {
+        const now     = new Date();
+        const labels  = [];
+        const income  = [];
+        const expense = [];
+
+        for (let i = count - 1; i >= 0; i--) {
+            const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+            labels.push(d.toLocaleString('en', { month: 'short' }));
+
+            const m   = d.getMonth();
+            const y   = d.getFullYear();
+            const txs = this.data.transactions.filter(t => {
+                const td = new Date(t.date);
+                return td.getMonth() === m && td.getFullYear() === y;
+            });
+
+            income.push(txs.filter(t => t.type === 'income') .reduce((s,t) => s+t.amount, 0));
+            expense.push(txs.filter(t => t.type === 'expense').reduce((s,t) => s+t.amount, 0));
+        }
+
+        return { labels, income, expense };
+    }
+
+    getYearlyData(count = 5) {
+        const now     = new Date();
+        const labels  = [];
+        const income  = [];
+        const expense = [];
+
+        for (let i = count - 1; i >= 0; i--) {
+            const y   = now.getFullYear() - i;
+            const txs = this.data.transactions.filter(t => new Date(t.date).getFullYear() === y);
+            labels.push(y.toString());
+            income.push(txs.filter(t => t.type === 'income') .reduce((s,t) => s+t.amount, 0));
+            expense.push(txs.filter(t => t.type === 'expense').reduce((s,t) => s+t.amount, 0));
+        }
+
+        return { labels, income, expense };
+    }
+
+    /* Budget status */
+    getBudgetStatus() {
+        const { monthTx } = this.getMonthStats();
+        return this.data.budgets.map(budget => {
+            const spent = monthTx
+                .filter(t => t.type === 'expense' && t.category === budget.category)
+                .reduce((s, t) => s + t.amount, 0);
+            const pct    = budget.limit > 0 ? Math.min(Math.round((spent / budget.limit) * 100), 999) : 0;
+            const status = pct >= 100 ? 'danger' : pct >= 80 ? 'warning' : 'safe';
+            return {
+                ...budget,
+                spent,
+                remaining:  Math.max(0, budget.limit - spent),
+                percentage: pct,
+                status,
+                info:       this.getCategoryInfo(budget.category)
+            };
+        });
+    }
+
+    /* Financial health score (0-100) */
+    getHealthScore() {
+        const stats       = this.getMonthStats();
+        const budgets     = this.getBudgetStatus();
+        let   score       = 50;
+
+        // Savings rate adds points
+        if (stats.savingsRate >= 30) score += 25;
+        else if (stats.savingsRate >= 20) score += 15;
+        else if (stats.savingsRate >= 10) score += 5;
+        else if (stats.savingsRate < 0)   score -= 20;
+
+        // Budget compliance
+        const overBudget  = budgets.filter(b => b.status === 'danger').length;
+        const warnBudget  = budgets.filter(b => b.status === 'warning').length;
+        score -= overBudget * 10;
+        score -= warnBudget * 5;
+
+        // Has transactions this month
+        if (stats.txCount > 0) score += 10;
+
+        // Has goals
+        if (this.data.goals.length > 0) score += 10;
+
+        // Has accounts set up
+        if (this.data.accounts.length >= 2) score += 5;
+
+        return Math.max(0, Math.min(100, score));
+    }
+
+    /* ════════════════════════
+       ACCOUNTS
+    ════════════════════════ */
+    getAccounts()       { return this.data.accounts || []; }
+    getAccountById(id)  { return this.data.accounts.find(a => a.id === id); }
+    getNetWorth()       { return this.data.accounts.reduce((s, a) => s + a.balance, 0); }
+
+    addAccount(account) {
+        account.id        = this._id();
+        account.createdAt = new Date().toISOString();
+        this.data.accounts.push(account);
+        this.save();
+        return account;
+    }
+
+    updateAccount(id, updates) {
+        const acc = this.data.accounts.find(a => a.id === id);
+        if (acc) { Object.assign(acc, updates); this.save(); }
+        return acc;
+    }
+
+    deleteAccount(id) {
+        if (this.data.accounts.length <= 1) return false;
+        // Move transactions to first account
+        const first = this.data.accounts.find(a => a.id !== id);
+        this.data.transactions.forEach(t => {
+            if (t.account === id) t.account = first ? first.id : null;
+        });
+        this.data.accounts = this.data.accounts.filter(a => a.id !== id);
         this.save();
         return true;
     }
 
-    /* ── Recently used categories ── */
-    getRecentCategories(type = 'expense', limit = 5) {
-        const recent = this.data.transactions
-            .filter(t => t.type === type)
-            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-            .slice(0, 20);
+    getAccountStats(id) {
+        const txs = this.data.transactions.filter(t => t.account === id);
+        return {
+            count:   txs.length,
+            income:  txs.filter(t => t.type === 'income') .reduce((s,t) => s+t.amount, 0),
+            expense: txs.filter(t => t.type === 'expense').reduce((s,t) => s+t.amount, 0)
+        };
+    }
 
-        const catMap = {};
-        recent.forEach(t => {
-            if (!catMap[t.category]) catMap[t.category] = 0;
-            catMap[t.category]++;
+    /* ════════════════════════
+       BUDGETS
+    ════════════════════════ */
+    getBudgets()      { return this.data.budgets || []; }
+    getBudgetById(id) { return this.data.budgets.find(b => b.id === id); }
+
+    addBudget(budget) {
+        const exists = this.data.budgets.find(b => b.category === budget.category);
+        if (exists) {
+            exists.limit = budget.limit;
+            this.save();
+            return exists;
+        }
+        budget.id = this._id();
+        this.data.budgets.push(budget);
+        this.save();
+        return budget;
+    }
+
+    updateBudget(id, updates) {
+        const b = this.data.budgets.find(b => b.id === id);
+        if (b) { Object.assign(b, updates); this.save(); }
+        return b;
+    }
+
+    deleteBudget(id) {
+        this.data.budgets = this.data.budgets.filter(b => b.id !== id);
+        this.save();
+        return true;
+    }
+
+    /* ════════════════════════
+       GOALS
+    ════════════════════════ */
+    getGoals()      { return this.data.goals || []; }
+    getGoalById(id) { return this.data.goals.find(g => g.id === id); }
+
+    addGoal(goal) {
+        goal.id        = this._id();
+        goal.createdAt = new Date().toISOString();
+        this.data.goals.push(goal);
+        this.save();
+        return goal;
+    }
+
+    updateGoal(id, updates) {
+        const g = this.data.goals.find(g => g.id === id);
+        if (g) { Object.assign(g, updates); this.save(); }
+        return g;
+    }
+
+    addToGoal(id, amount) {
+        const g = this.data.goals.find(g => g.id === id);
+        if (!g) return null;
+        g.saved = Math.min(g.saved + Number(amount), g.target);
+        this.save();
+        return g;
+    }
+
+    deleteGoal(id) {
+        this.data.goals = this.data.goals.filter(g => g.id !== id);
+        this.save();
+        return true;
+    }
+
+    /* ════════════════════════
+       BILLS
+    ════════════════════════ */
+    getBills()      { return this.data.bills || []; }
+    getBillById(id) { return this.data.bills.find(b => b.id === id); }
+
+    addBill(bill) {
+        bill.id   = this._id();
+        bill.paid = false;
+        this.data.bills.push(bill);
+        this.save();
+        return bill;
+    }
+
+    updateBill(id, updates) {
+        const b = this.data.bills.find(b => b.id === id);
+        if (b) { Object.assign(b, updates); this.save(); }
+        return b;
+    }
+
+    payBill(id) {
+        return this.updateBill(id, { paid: true });
+    }
+
+    unpayBill(id) {
+        return this.updateBill(id, { paid: false });
+    }
+
+    deleteBill(id) {
+        this.data.bills = this.data.bills.filter(b => b.id !== id);
+        this.save();
+        return true;
+    }
+
+    resetBills() {
+        this.data.bills.forEach(b => b.paid = false);
+        this.save();
+    }
+
+    getBillStats() {
+        const today  = new Date().getDate();
+        const bills  = this.data.bills;
+        const total  = bills.reduce((s, b) => s + b.amount, 0);
+        const paid   = bills.filter(b => b.paid);
+        const unpaid = bills.filter(b => !b.paid);
+        const overdue = unpaid.filter(b => today > b.dueDay);
+        const upcoming = unpaid.filter(b => {
+            const diff = b.dueDay - today;
+            return diff >= 0 && diff <= 7;
         });
 
-        return Object.entries(catMap)
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, limit)
-            .map(([cat]) => cat);
-    }
-
-    /* ── Today's spending ── */
-    getTodayStats() {
-        const today = new Date().toISOString().split('T')[0];
-        const txs   = this.data.transactions.filter(t => t.date === today);
         return {
-            income:  txs.filter(t => t.type === 'income') .reduce((s,t) => s+t.amount, 0),
-            expense: txs.filter(t => t.type === 'expense').reduce((s,t) => s+t.amount, 0),
-            count:   txs.length,
-            txs
+            total,
+            totalCount:    bills.length,
+            paidCount:     paid.length,
+            unpaidCount:   unpaid.length,
+            overdueCount:  overdue.length,
+            upcomingCount: upcoming.length,
+            paidAmount:    paid.reduce((s,b) => s+b.amount, 0),
+            unpaidAmount:  unpaid.reduce((s,b) => s+b.amount, 0),
+            overdue,
+            upcoming
         };
     }
 
-    /* ── Streak tracking ── */
-    updateStreak() {
-        const today  = new Date().toISOString().split('T')[0];
-        const streak = this.data.streak || { count: 0, lastDate: null };
+    /* ════════════════════════
+       EXPORT / IMPORT
+    ════════════════════════ */
+    exportAll() {
+        return JSON.stringify(this.data, null, 2);
+    }
 
-        if (streak.lastDate === today) return; // already counted today
+    exportCSV() {
+        const headers = [
+            'Date','Type','Category','Description',
+            'Amount','Account','Notes'
+        ].join(',');
 
-        const yesterday = this._dateOffset(-1);
-        if (streak.lastDate === yesterday) {
-            streak.count++;
-        } else if (streak.lastDate !== today) {
-            streak.count = 1;
+        const rows = this.data.transactions.map(t => {
+            const cat = this.getCategoryInfo(t.category);
+            const acc = this.getAccountById(t.account);
+            return [
+                t.date,
+                t.type,
+                `"${cat.name}"`,
+                `"${t.description}"`,
+                t.amount,
+                `"${acc ? acc.name : 'Unknown'}"`,
+                `"${t.notes || ''}"`
+            ].join(',');
+        });
+
+        return [headers, ...rows].join('\n');
+    }
+
+    exportTransactionsJSON() {
+        return JSON.stringify(this.data.transactions, null, 2);
+    }
+
+    importData(jsonStr) {
+        try {
+            const d = JSON.parse(jsonStr);
+            if (d && Array.isArray(d.transactions)) {
+                this.data = this._migrate(d);
+                this.save();
+                return true;
+            }
+            return false;
+        } catch(e) {
+            return false;
         }
-
-        streak.lastDate = today;
-        this.data.streak = streak;
     }
 
-    getStreak() {
-        return this.data.streak || { count: 0, lastDate: null };
-    }
-
-    /* ── Templates ── */
-    getTemplates()    { return this.data.templates || []; }
-
-    addTemplate(template) {
-        template.id = this._id();
-        this.data.templates.push(template);
-        this.save();
-        return template;
-    }
-
-    deleteTemplate(id) {
-        this.data.templates = this.data.templates.filter(t => t.id !== id);
+    clearAll() {
+        const fresh         = this._getDefault();
+        fresh.transactions  = [];
+        fresh.settings      = this.data.settings; // keep settings
+        this.data           = fresh;
         this.save();
     }
 
-    useTemplate(templateId) {
-        const tmpl = this.data.templates.find(t => t.id === templateId);
-        if (!tmpl) return null;
-        return {
-            type:        tmpl.type,
-            amount:      tmpl.amount,
-            category:    tmpl.category,
-            description: tmpl.description,
-            date:        new Date().toISOString().split('T')[0],
-            account:     this.data.accounts[0]?.id,
-            notes:       'From template: ' + tmpl.name,
-            tags:        ['template']
-        };
-    }
-
-    /* ── Data size ── */
-    getDataSize() {
-        const json = JSON.stringify(this.data);
-        const bytes = new Blob([json]).size;
-        if (bytes < 1024)        return bytes + ' B';
-        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-        return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
-    }
-
-    /* ── Auto backup check ── */
-    needsBackup() {
-        if (!this.data.lastBackup) return true;
-        const daysSince = Math.floor(
-            (Date.now() - new Date(this.data.lastBackup).getTime()) / 86400000
-        );
-        return daysSince >= 7;
-    }
-
-    markBackupDone() {
-        this.data.lastBackup = new Date().toISOString();
-        this.save();
-    }
-
-    // ══════════════════════════════════════
-    // REST OF METHODS (same as before)
-    // filterTransactions, getMonthStats, 
-    // accounts, budgets, goals, bills,
-    // export/import, etc.
-    // → All remain unchanged from Step 5
-    // ══════════════════════════════════════
-
-    /* KEEPING ALL EXISTING METHODS FROM STEP 5 */
-    /* Copy all methods from the Step 5 store.js */
-    /* Only the constructor, _load, _getBlankData, */
-    /* _getDummyData, deleteTransaction are changed */
-
-    // ... (all other methods from Step 5 remain same)
-
-    /* ── AUTH STATIC METHODS ── */
+    /* ════════════════════════
+       AUTH HELPERS
+    ════════════════════════ */
     static getAuthUser() {
-        try { return JSON.parse(localStorage.getItem(AUTH_KEY)); }
-        catch(e) { return null; }
+        try {
+            return JSON.parse(localStorage.getItem(AUTH_KEY));
+        } catch(e) { return null; }
     }
 
     static isLoggedIn() {
@@ -583,25 +791,17 @@ class DataStore {
             const auth    = JSON.parse(localStorage.getItem(AUTH_KEY));
             const session = JSON.parse(localStorage.getItem(SESSION_KEY));
             if (!auth || !session) return false;
-            return Date.now() <= session.expires;
+            if (Date.now() > session.expires) return false;
+            return true;
         } catch(e) { return false; }
     }
 
     static logout() {
-        // Keep data — just clear session
         localStorage.removeItem(AUTH_KEY);
         localStorage.removeItem(SESSION_KEY);
-
-        // Firebase logout
-        try {
-            if (typeof firebase !== 'undefined' && firebase.auth) {
-                firebase.auth().signOut();
-            }
-        } catch(e) {}
-
         window.location.href = 'index.html';
     }
 }
 
-/* ── Initialize global store ── */
+/* ── GLOBAL STORE INSTANCE ── */
 const Store = new DataStore();

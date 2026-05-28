@@ -1,114 +1,68 @@
 /* ============================================================
-   AITOOLCOR MONEYWISE - AUTH SYSTEM (UPDATED)
+   AITOOLCOR MONEYWISE - AUTH SYSTEM
    File: js/auth.js
-   
-   ✅ Real Firebase Google Auth
-   ✅ Per-user data isolation
-   ✅ Guest → dummy data
-   ✅ New user → blank data
-   ✅ Default INR currency
+   Description: Google + Email Login/Register + Guest Mode
    ============================================================ */
 
-// ══════════════════════════════════════════
-// FIREBASE CONFIG — Replace with YOUR config
-// Go to: console.firebase.google.com
-// Project Settings → Web App → Config
-// ══════════════════════════════════════════
+// ── FIREBASE CONFIG ──
+// Replace with your Firebase project config from:
+// console.firebase.google.com → Project Settings → Web App
 const FIREBASE_CONFIG = {
-    apiKey:            "AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXX",
-    authDomain:        "your-project.firebaseapp.com",
-    projectId:         "your-project-id",
-    storageBucket:     "your-project.appspot.com",
-    messagingSenderId: "123456789",
-    appId:             "1:123456789:web:abcdef123456"
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
 };
 
-// ══════════════════════════════════════════
-// CONSTANTS
-// ══════════════════════════════════════════
-const AUTH_KEY        = 'aitoolcor_mw_auth';
-const SESSION_KEY     = 'aitoolcor_mw_session';
-const DATA_PREFIX     = 'aitoolcor_mw_data_';
-const ACCOUNTS_KEY    = 'aitoolcor_mw_accounts';
+// ── INIT FIREBASE ──
+let firebaseApp = null;
+let firebaseAuth = null;
+let useFirebase = false;
 
-let firebaseApp       = null;
-let firebaseAuth      = null;
-let useFirebase       = false;
-let googleProvider    = null;
-
-// ══════════════════════════════════════════
-// FIREBASE INIT
-// ══════════════════════════════════════════
 function initFirebase() {
     try {
-        if (typeof firebase !== 'undefined' &&
-            FIREBASE_CONFIG.apiKey &&
-            !FIREBASE_CONFIG.apiKey.includes('XXXX')) {
+        if (typeof firebase !== 'undefined' && FIREBASE_CONFIG.apiKey !== 'YOUR_API_KEY') {
+            firebaseApp  = firebase.initializeApp(FIREBASE_CONFIG);
+            firebaseAuth = firebase.auth();
+            useFirebase  = true;
 
-            firebaseApp    = firebase.initializeApp(FIREBASE_CONFIG);
-            firebaseAuth   = firebase.auth();
-            googleProvider = new firebase.auth.GoogleAuthProvider();
-
-            googleProvider.addScope('profile');
-            googleProvider.addScope('email');
-
-            // Persistence
-            firebaseAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-
-            // Auth state watcher
+            // Watch auth state
             firebaseAuth.onAuthStateChanged((user) => {
                 if (user) {
-                    handleFirebaseUser(user);
+                    // User is logged in → redirect to app
+                    saveAuthSession({
+                        uid:      user.uid,
+                        name:     user.displayName || 'User',
+                        email:    user.email,
+                        photo:    user.photoURL,
+                        provider: user.providerData[0]?.providerId || 'email',
+                        isGuest:  false
+                    });
+                    redirectToApp();
                 }
             });
 
-            useFirebase = true;
             console.log('✅ Firebase initialized');
         } else {
-            console.warn('⚠️ Firebase not configured — local mode');
+            console.warn('⚠️ Firebase not configured — using local mode');
         }
     } catch(e) {
-        console.warn('⚠️ Firebase init error:', e);
-        useFirebase = false;
+        console.warn('⚠️ Firebase init failed — using local mode', e);
     }
 }
 
-// ══════════════════════════════════════════
-// HANDLE FIREBASE USER (Google or Email)
-// ══════════════════════════════════════════
-function handleFirebaseUser(user) {
-    const authData = {
-        uid:        user.uid,
-        name:       user.displayName || user.email?.split('@')[0] || 'User',
-        email:      user.email,
-        photo:      user.photoURL,
-        provider:   user.providerData[0]?.providerId || 'email',
-        isGuest:    false,
-        isNewUser:  false, // will be set properly
-        loginTime:  Date.now()
-    };
+// ── STORAGE KEYS ──
+const AUTH_KEY    = 'aitoolcor_mw_auth';
+const SESSION_KEY = 'aitoolcor_mw_session';
 
-    // Check if this user has existing data
-    const existingData = localStorage.getItem(DATA_PREFIX + user.uid);
-    if (existingData) {
-        authData.isNewUser = false;
-        console.log('✅ Returning user — loading saved data');
-    } else {
-        authData.isNewUser = true;
-        console.log('🆕 New user — will create blank data');
-    }
-
-    saveAuthSession(authData);
-}
-
-// ══════════════════════════════════════════
-// SAVE / GET / CLEAR SESSION
-// ══════════════════════════════════════════
+// ── SAVE / GET / CLEAR SESSION ──
 function saveAuthSession(user) {
     localStorage.setItem(AUTH_KEY, JSON.stringify(user));
     localStorage.setItem(SESSION_KEY, JSON.stringify({
         timestamp: Date.now(),
-        expires:   Date.now() + (90 * 24 * 60 * 60 * 1000) // 90 days
+        expires: Date.now() + (30 * 24 * 60 * 60 * 1000) // 30 days
     }));
 }
 
@@ -122,9 +76,7 @@ function getAuthSession() {
             return null;
         }
         return auth;
-    } catch(e) {
-        return null;
-    }
+    } catch(e) { return null; }
 }
 
 function clearAuthSession() {
@@ -132,355 +84,21 @@ function clearAuthSession() {
     localStorage.removeItem(SESSION_KEY);
 }
 
-// ══════════════════════════════════════════
-// GET USER-SPECIFIC STORAGE KEY
-// ══════════════════════════════════════════
-function getUserStorageKey() {
-    const auth = getAuthSession();
-    if (!auth || !auth.uid) return DATA_PREFIX + 'guest_default';
-    return DATA_PREFIX + auth.uid;
-}
-
-function isNewUser() {
-    const auth = getAuthSession();
-    return auth?.isNewUser === true;
-}
-
-function isGuestUser() {
-    const auth = getAuthSession();
-    return auth?.isGuest === true;
-}
-
-function markUserAsReturning() {
-    const auth = getAuthSession();
-    if (auth) {
-        auth.isNewUser = false;
-        saveAuthSession(auth);
-    }
-}
-
-// ══════════════════════════════════════════
-// REDIRECT
-// ══════════════════════════════════════════
 function redirectToApp() {
     window.location.href = 'app.html';
 }
 
+// ── CHECK IF ALREADY LOGGED IN ──
 function checkExistingSession() {
     const session = getAuthSession();
-    if (session) {
-        redirectToApp();
-    }
+    if (session) redirectToApp();
 }
 
-// ══════════════════════════════════════════
-// GOOGLE SIGN IN
-// ══════════════════════════════════════════
-async function handleGoogleSignIn() {
-    if (!useFirebase) {
-        Toast.warning('Firebase not configured. Use Guest mode or Email login.');
-        return;
-    }
-
-    try {
-        setLoading('googleSignInBtn', true);
-
-        const result = await firebaseAuth.signInWithPopup(googleProvider);
-        const user   = result.user;
-        const isNew  = result.additionalUserInfo?.isNewUser || false;
-
-        const authData = {
-            uid:       user.uid,
-            name:      user.displayName || 'User',
-            email:     user.email,
-            photo:     user.photoURL,
-            provider:  'google',
-            isGuest:   false,
-            isNewUser: isNew && !localStorage.getItem(DATA_PREFIX + user.uid),
-            loginTime: Date.now()
-        };
-
-        saveAuthSession(authData);
-        Toast.success(`Welcome${isNew ? '' : ' back'}, ${authData.name.split(' ')[0]}!`);
-        setTimeout(redirectToApp, 600);
-
-    } catch(e) {
-        setLoading('googleSignInBtn', false);
-        const msg = getFirebaseErrorMessage(e.code);
-        if (e.code !== 'auth/popup-closed-by-user') {
-            Toast.error(msg);
-        }
-        console.error('Google sign-in error:', e);
-    }
-}
-
-// ══════════════════════════════════════════
-// EMAIL LOGIN
-// ══════════════════════════════════════════
-async function handleEmailLogin() {
-    clearAllErrors();
-
-    const email    = document.getElementById('loginEmail').value.trim();
-    const password = document.getElementById('loginPassword').value;
-    let hasError   = false;
-
-    if (!email) {
-        showError('loginEmailError', 'Email is required');
-        hasError = true;
-    } else if (!isValidEmail(email)) {
-        showError('loginEmailError', 'Enter a valid email');
-        hasError = true;
-    }
-
-    if (!password) {
-        showError('loginPasswordError', 'Password is required');
-        hasError = true;
-    } else if (password.length < 6) {
-        showError('loginPasswordError', 'Min. 6 characters');
-        hasError = true;
-    }
-
-    if (hasError) return;
-
-    if (useFirebase) {
-        // Firebase email login
-        try {
-            setLoading('loginSubmitBtn', true);
-            const result = await firebaseAuth.signInWithEmailAndPassword(email, password);
-            // onAuthStateChanged handles the rest
-            Toast.success('Welcome back!');
-            setTimeout(redirectToApp, 600);
-        } catch(e) {
-            setLoading('loginSubmitBtn', false);
-            const msg = getFirebaseErrorMessage(e.code);
-            if (e.code.includes('user-not-found') || e.code.includes('invalid-credential')) {
-                showError('loginEmailError', msg);
-            } else if (e.code.includes('wrong-password')) {
-                showError('loginPasswordError', 'Incorrect password');
-            } else {
-                Toast.error(msg);
-            }
-        }
-    } else {
-        // Local email login
-        handleLocalLogin(email, password);
-    }
-}
-
-function handleLocalLogin(email, password) {
-    setLoading('loginSubmitBtn', true);
-    const accounts = JSON.parse(localStorage.getItem(ACCOUNTS_KEY) || '[]');
-    const account  = accounts.find(a =>
-        a.email === email && a.password === btoa(password)
-    );
-
-    setTimeout(() => {
-        if (account) {
-            const hasData = !!localStorage.getItem(DATA_PREFIX + account.uid);
-            saveAuthSession({
-                uid:       account.uid,
-                name:      account.name,
-                email:     account.email,
-                photo:     null,
-                provider:  'email',
-                isGuest:   false,
-                isNewUser: !hasData,
-                loginTime: Date.now()
-            });
-            Toast.success('Welcome back, ' + account.name.split(' ')[0] + '!');
-            setTimeout(redirectToApp, 500);
-        } else {
-            setLoading('loginSubmitBtn', false);
-            showError('loginEmailError', 'No account found or wrong password');
-            showError('loginPasswordError', 'Check your credentials');
-        }
-    }, 600);
-}
-
-// ══════════════════════════════════════════
-// EMAIL REGISTER
-// ══════════════════════════════════════════
-async function handleEmailRegister() {
-    clearAllErrors();
-
-    const name     = document.getElementById('registerName').value.trim();
-    const email    = document.getElementById('registerEmail').value.trim();
-    const password = document.getElementById('registerPassword').value;
-    const confirm  = document.getElementById('registerConfirmPassword').value;
-    const terms    = document.getElementById('termsCheckbox').checked;
-    let hasError   = false;
-
-    if (!name || name.length < 2) {
-        showError('registerNameError', 'Name required (min. 2 chars)');
-        hasError = true;
-    }
-
-    if (!email) {
-        showError('registerEmailError', 'Email is required');
-        hasError = true;
-    } else if (!isValidEmail(email)) {
-        showError('registerEmailError', 'Enter a valid email');
-        hasError = true;
-    }
-
-    if (!password) {
-        showError('registerPasswordError', 'Password required');
-        hasError = true;
-    } else if (password.length < 6) {
-        showError('registerPasswordError', 'Min. 6 characters');
-        hasError = true;
-    }
-
-    if (!confirm) {
-        showError('registerConfirmError', 'Confirm your password');
-        hasError = true;
-    } else if (password !== confirm) {
-        showError('registerConfirmError', 'Passwords don\'t match');
-        hasError = true;
-    }
-
-    if (!terms) {
-        Toast.warning('Please agree to Terms & Privacy Policy');
-        hasError = true;
-    }
-
-    if (hasError) return;
-
-    if (useFirebase) {
-        try {
-            setLoading('registerSubmitBtn', true);
-            const result = await firebaseAuth.createUserWithEmailAndPassword(email, password);
-            await result.user.updateProfile({ displayName: name });
-
-            saveAuthSession({
-                uid:       result.user.uid,
-                name:      name,
-                email:     email,
-                photo:     null,
-                provider:  'email',
-                isGuest:   false,
-                isNewUser: true, // new user → blank data
-                loginTime: Date.now()
-            });
-
-            Toast.success(`Account created! Welcome, ${name.split(' ')[0]}!`);
-            setTimeout(redirectToApp, 600);
-        } catch(e) {
-            setLoading('registerSubmitBtn', false);
-            if (e.code === 'auth/email-already-in-use') {
-                showError('registerEmailError', 'Email already registered');
-            } else {
-                Toast.error(getFirebaseErrorMessage(e.code));
-            }
-        }
-    } else {
-        handleLocalRegister(name, email, password);
-    }
-}
-
-function handleLocalRegister(name, email, password) {
-    setLoading('registerSubmitBtn', true);
-    const accounts = JSON.parse(localStorage.getItem(ACCOUNTS_KEY) || '[]');
-
-    if (accounts.find(a => a.email === email)) {
-        setLoading('registerSubmitBtn', false);
-        showError('registerEmailError', 'Email already registered');
-        return;
-    }
-
-    const uid = 'local_' + Date.now().toString(36) +
-                Math.random().toString(36).substr(2, 5);
-
-    accounts.push({ uid, name, email, password: btoa(password) });
-    localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
-
-    setTimeout(() => {
-        saveAuthSession({
-            uid, name, email,
-            photo:     null,
-            provider:  'email',
-            isGuest:   false,
-            isNewUser: true, // blank data
-            loginTime: Date.now()
-        });
-        Toast.success(`Account created! Welcome, ${name.split(' ')[0]}!`);
-        setTimeout(redirectToApp, 600);
-    }, 600);
-}
-
-// ══════════════════════════════════════════
-// GUEST LOGIN → LOADS DUMMY DATA
-// ══════════════════════════════════════════
-function handleGuestLogin() {
-    const guestId = 'guest_' + Date.now().toString(36);
-
-    saveAuthSession({
-        uid:       guestId,
-        name:      'Guest User',
-        email:     'guest@moneywise.local',
-        photo:     null,
-        provider:  'guest',
-        isGuest:   true,
-        isNewUser: false, // Guest = dummy data (NOT blank)
-        loginTime: Date.now()
-    });
-
-    Toast.info('Continuing as Guest with sample data. Your data is saved locally.');
-    setTimeout(redirectToApp, 500);
-}
-
-// ══════════════════════════════════════════
-// FORGOT PASSWORD
-// ══════════════════════════════════════════
-async function handleForgotPassword() {
-    const email = document.getElementById('loginEmail').value.trim();
-
-    if (!email || !isValidEmail(email)) {
-        showError('loginEmailError', 'Enter your email first');
-        return;
-    }
-
-    if (!useFirebase) {
-        Toast.info('Password reset not available in local mode');
-        return;
-    }
-
-    try {
-        await firebaseAuth.sendPasswordResetEmail(email);
-        Toast.success('Password reset email sent! Check inbox.', 'Email Sent');
-    } catch(e) {
-        Toast.error(getFirebaseErrorMessage(e.code));
-    }
-}
-
-// ══════════════════════════════════════════
-// FIREBASE ERROR MESSAGES
-// ══════════════════════════════════════════
-function getFirebaseErrorMessage(code) {
-    const map = {
-        'auth/user-not-found':         'No account found with this email',
-        'auth/wrong-password':         'Incorrect password',
-        'auth/invalid-email':          'Invalid email address',
-        'auth/email-already-in-use':   'Email already registered',
-        'auth/weak-password':          'Password too weak (min 6 chars)',
-        'auth/network-request-failed': 'Network error. Check connection.',
-        'auth/too-many-requests':      'Too many attempts. Try later.',
-        'auth/popup-closed-by-user':   'Sign-in cancelled',
-        'auth/popup-blocked':          'Popup blocked. Allow popups.',
-        'auth/invalid-credential':     'Invalid credentials',
-        'auth/user-disabled':          'Account disabled',
-        'auth/requires-recent-login':  'Please login again',
-    };
-    return map[code] || 'An error occurred. Please try again.';
-}
-
-// ══════════════════════════════════════════
-// FORM HELPERS
-// ══════════════════════════════════════════
+// ── FORM SWITCH ──
 function switchForm(form) {
-    clearAllErrors();
     const loginPanel    = document.getElementById('loginPanel');
     const registerPanel = document.getElementById('registerPanel');
+    clearAllErrors();
 
     if (form === 'register') {
         loginPanel.classList.remove('active');
@@ -499,6 +117,7 @@ function switchForm(form) {
     }
 }
 
+// ── TOGGLE PASSWORD VISIBILITY ──
 function togglePw(inputId, btn) {
     const input = document.getElementById(inputId);
     const icon  = btn.querySelector('i');
@@ -511,15 +130,25 @@ function togglePw(inputId, btn) {
     }
 }
 
+// ── PASSWORD STRENGTH ──
 function checkPasswordStrength(value) {
     const wrap  = document.getElementById('pwStrengthWrap');
     const label = document.getElementById('pwStrengthLabel');
-    const bars  = ['pwBar1','pwBar2','pwBar3','pwBar4'].map(id =>
-        document.getElementById(id));
+    const bars  = [
+        document.getElementById('pwBar1'),
+        document.getElementById('pwBar2'),
+        document.getElementById('pwBar3'),
+        document.getElementById('pwBar4')
+    ];
 
-    if (!value) { wrap.style.display = 'none'; return; }
+    if (!value) {
+        wrap.style.display = 'none';
+        bars.forEach(b => { b.className = 'pw-bar'; });
+        return;
+    }
+
     wrap.style.display = 'block';
-    bars.forEach(b => b.className = 'pw-bar');
+    bars.forEach(b => { b.className = 'pw-bar'; });
 
     let score = 0;
     if (value.length >= 6)  score++;
@@ -527,128 +156,416 @@ function checkPasswordStrength(value) {
     if (/[A-Z]/.test(value) && /[0-9]/.test(value)) score++;
     if (/[^a-zA-Z0-9]/.test(value)) score++;
 
-    const levels = [
-        { max: 1, cls: 'weak',   text: 'Weak' },
-        { max: 2, cls: 'medium', text: 'Fair' },
-        { max: 3, cls: 'strong', text: 'Good' },
-        { max: 4, cls: 'strong', text: 'Strong 💪' }
-    ];
-
-    const level = levels.find(l => score <= l.max) || levels[3];
-    for (let i = 0; i < score; i++) {
-        bars[i]?.classList.add(level.cls);
+    if (score <= 1) {
+        bars[0].classList.add('weak');
+        label.textContent = 'Weak';
+        label.className = 'pw-strength-label weak';
+    } else if (score === 2) {
+        bars[0].classList.add('medium');
+        bars[1].classList.add('medium');
+        label.textContent = 'Fair';
+        label.className = 'pw-strength-label medium';
+    } else if (score === 3) {
+        bars[0].classList.add('strong');
+        bars[1].classList.add('strong');
+        bars[2].classList.add('strong');
+        label.textContent = 'Good';
+        label.className = 'pw-strength-label strong';
+    } else {
+        bars.forEach(b => b.classList.add('strong'));
+        label.textContent = 'Strong 💪';
+        label.className = 'pw-strength-label strong';
     }
-    label.textContent = level.text;
-    label.className = `pw-strength-label ${level.cls}`;
 }
 
-function showError(fieldId, msg) {
-    const el    = document.getElementById(fieldId);
-    const input = document.getElementById(fieldId.replace('Error', ''));
-    if (el)    { el.querySelector('span').textContent = msg; el.classList.add('show'); }
+// ── VALIDATION HELPERS ──
+function showError(fieldId, message) {
+    const errorEl = document.getElementById(fieldId);
+    const inputId = fieldId.replace('Error', '');
+    const input   = document.getElementById(inputId);
+
+    if (errorEl) {
+        errorEl.querySelector('span').textContent = message;
+        errorEl.classList.add('show');
+    }
     if (input) input.classList.add('error');
 }
 
 function clearError(fieldId) {
-    const el    = document.getElementById(fieldId);
-    const input = document.getElementById(fieldId.replace('Error', ''));
-    if (el)    el.classList.remove('show');
-    if (input) input.classList.remove('error');
+    const errorEl = document.getElementById(fieldId);
+    const inputId = fieldId.replace('Error', '');
+    const input   = document.getElementById(inputId);
+
+    if (errorEl) errorEl.classList.remove('show');
+    if (input)   input.classList.remove('error');
 }
 
 function clearAllErrors() {
-    document.querySelectorAll('.auth-field-error').forEach(el =>
-        el.classList.remove('show'));
-    document.querySelectorAll('.auth-input').forEach(el =>
-        el.classList.remove('error'));
+    document.querySelectorAll('.auth-field-error').forEach(el => el.classList.remove('show'));
+    document.querySelectorAll('.auth-input').forEach(el => el.classList.remove('error'));
 }
 
-function isValidEmail(e) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
+// ── SET BUTTON LOADING ──
 function setLoading(btnId, loading) {
     const btn = document.getElementById(btnId);
     if (!btn) return;
-    btn.classList.toggle('loading', loading);
-    btn.disabled = loading;
+    if (loading) {
+        btn.classList.add('loading');
+        btn.disabled = true;
+    } else {
+        btn.classList.remove('loading');
+        btn.disabled = false;
+    }
 }
 
-// ══════════════════════════════════════════
-// SETUP
-// ══════════════════════════════════════════
+// ── GOOGLE SIGN IN ──
+async function handleGoogleSignIn() {
+    if (!useFirebase) {
+        // Local guest mode fallback
+        Toast.warning('Firebase not configured. Continuing as Guest.');
+        handleGuestLogin();
+        return;
+    }
+
+    try {
+        setLoading('googleSignInBtn', true);
+        const provider = new firebase.auth.GoogleAuthProvider();
+        provider.addScope('profile');
+        provider.addScope('email');
+        await firebaseAuth.signInWithPopup(provider);
+        // onAuthStateChanged handles the redirect
+    } catch(e) {
+        setLoading('googleSignInBtn', false);
+        const msg = getFirebaseErrorMessage(e.code);
+        Toast.error(msg);
+        console.error('Google sign-in error:', e);
+    }
+}
+
+// ── EMAIL LOGIN ──
+async function handleEmailLogin() {
+    clearAllErrors();
+
+    const email    = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+
+    // Validate
+    let hasError = false;
+
+    if (!email) {
+        showError('loginEmailError', 'Email is required');
+        hasError = true;
+    } else if (!isValidEmail(email)) {
+        showError('loginEmailError', 'Enter a valid email address');
+        hasError = true;
+    }
+
+    if (!password) {
+        showError('loginPasswordError', 'Password is required');
+        hasError = true;
+    } else if (password.length < 6) {
+        showError('loginPasswordError', 'Password must be at least 6 characters');
+        hasError = true;
+    }
+
+    if (hasError) return;
+
+    if (!useFirebase) {
+        // Local mode — check localStorage accounts
+        handleLocalLogin(email, password);
+        return;
+    }
+
+    try {
+        setLoading('loginSubmitBtn', true);
+        await firebaseAuth.signInWithEmailAndPassword(email, password);
+        // onAuthStateChanged handles redirect
+    } catch(e) {
+        setLoading('loginSubmitBtn', false);
+        const msg = getFirebaseErrorMessage(e.code);
+
+        if (e.code === 'auth/user-not-found' || e.code === 'auth/invalid-credential') {
+            showError('loginEmailError', msg);
+        } else if (e.code === 'auth/wrong-password') {
+            showError('loginPasswordError', 'Incorrect password. Please try again.');
+        } else {
+            Toast.error(msg);
+        }
+        console.error('Login error:', e);
+    }
+}
+
+// ── LOCAL LOGIN (no Firebase) ──
+function handleLocalLogin(email, password) {
+    setLoading('loginSubmitBtn', true);
+    const accounts = JSON.parse(localStorage.getItem('aitoolcor_mw_accounts') || '[]');
+    const account  = accounts.find(a => a.email === email && a.password === btoa(password));
+
+    setTimeout(() => {
+        if (account) {
+            saveAuthSession({
+                uid:      account.uid,
+                name:     account.name,
+                email:    account.email,
+                photo:    null,
+                provider: 'email',
+                isGuest:  false
+            });
+            Toast.success('Welcome back, ' + account.name.split(' ')[0] + '!');
+            setTimeout(redirectToApp, 500);
+        } else {
+            setLoading('loginSubmitBtn', false);
+            showError('loginEmailError', 'No account found with this email.');
+            showError('loginPasswordError', 'Or password is incorrect.');
+        }
+    }, 800);
+}
+
+// ── EMAIL REGISTER ──
+async function handleEmailRegister() {
+    clearAllErrors();
+
+    const name     = document.getElementById('registerName').value.trim();
+    const email    = document.getElementById('registerEmail').value.trim();
+    const password = document.getElementById('registerPassword').value;
+    const confirm  = document.getElementById('registerConfirmPassword').value;
+    const terms    = document.getElementById('termsCheckbox').checked;
+
+    let hasError = false;
+
+    if (!name || name.length < 2) {
+        showError('registerNameError', 'Please enter your full name (min. 2 characters)');
+        hasError = true;
+    }
+
+    if (!email) {
+        showError('registerEmailError', 'Email is required');
+        hasError = true;
+    } else if (!isValidEmail(email)) {
+        showError('registerEmailError', 'Enter a valid email address');
+        hasError = true;
+    }
+
+    if (!password) {
+        showError('registerPasswordError', 'Password is required');
+        hasError = true;
+    } else if (password.length < 6) {
+        showError('registerPasswordError', 'Password must be at least 6 characters');
+        hasError = true;
+    }
+
+    if (!confirm) {
+        showError('registerConfirmError', 'Please confirm your password');
+        hasError = true;
+    } else if (password !== confirm) {
+        showError('registerConfirmError', 'Passwords do not match');
+        hasError = true;
+    }
+
+    if (!terms) {
+        Toast.warning('Please agree to the Terms of Service to continue.');
+        hasError = true;
+    }
+
+    if (hasError) return;
+
+    if (!useFirebase) {
+        handleLocalRegister(name, email, password);
+        return;
+    }
+
+    try {
+        setLoading('registerSubmitBtn', true);
+        const result = await firebaseAuth.createUserWithEmailAndPassword(email, password);
+        await result.user.updateProfile({ displayName: name });
+        // onAuthStateChanged handles redirect
+    } catch(e) {
+        setLoading('registerSubmitBtn', false);
+        const msg = getFirebaseErrorMessage(e.code);
+
+        if (e.code === 'auth/email-already-in-use') {
+            showError('registerEmailError', 'An account with this email already exists.');
+        } else {
+            Toast.error(msg);
+        }
+        console.error('Register error:', e);
+    }
+}
+
+// ── LOCAL REGISTER (no Firebase) ──
+function handleLocalRegister(name, email, password) {
+    setLoading('registerSubmitBtn', true);
+    const accounts = JSON.parse(localStorage.getItem('aitoolcor_mw_accounts') || '[]');
+
+    if (accounts.find(a => a.email === email)) {
+        setLoading('registerSubmitBtn', false);
+        showError('registerEmailError', 'An account with this email already exists.');
+        return;
+    }
+
+    const uid = 'local_' + Date.now().toString(36);
+    accounts.push({ uid, name, email, password: btoa(password) });
+    localStorage.setItem('aitoolcor_mw_accounts', JSON.stringify(accounts));
+
+    setTimeout(() => {
+        saveAuthSession({ uid, name, email, photo: null, provider: 'email', isGuest: false });
+        Toast.success('Account created! Welcome, ' + name.split(' ')[0] + '!');
+        setTimeout(redirectToApp, 600);
+    }, 800);
+}
+
+// ── GUEST LOGIN ──
+function handleGuestLogin() {
+    const guestId = 'guest_' + Date.now().toString(36);
+    saveAuthSession({
+        uid:      guestId,
+        name:     'Guest User',
+        email:    'guest@local.moneywise',
+        photo:    null,
+        provider: 'guest',
+        isGuest:  true
+    });
+    Toast.info('Continuing as Guest. Your data is saved locally.');
+    setTimeout(redirectToApp, 600);
+}
+
+// ── FORGOT PASSWORD ──
+async function handleForgotPassword() {
+    const email = document.getElementById('loginEmail').value.trim();
+
+    if (!email) {
+        showError('loginEmailError', 'Enter your email address first');
+        return;
+    }
+
+    if (!isValidEmail(email)) {
+        showError('loginEmailError', 'Enter a valid email address');
+        return;
+    }
+
+    if (!useFirebase) {
+        Toast.info('Password reset not available in local mode.');
+        return;
+    }
+
+    try {
+        await firebaseAuth.sendPasswordResetEmail(email);
+        Toast.success('Reset email sent! Check your inbox.', 'Check Email');
+    } catch(e) {
+        const msg = getFirebaseErrorMessage(e.code);
+        Toast.error(msg);
+    }
+}
+
+// ── FIREBASE ERROR MESSAGES ──
+function getFirebaseErrorMessage(code) {
+    const messages = {
+        'auth/user-not-found':      'No account found with this email.',
+        'auth/wrong-password':      'Incorrect password. Please try again.',
+        'auth/invalid-email':       'Invalid email address.',
+        'auth/email-already-in-use':'An account with this email already exists.',
+        'auth/weak-password':       'Password is too weak. Use at least 6 characters.',
+        'auth/network-request-failed': 'Network error. Check your connection.',
+        'auth/too-many-requests':   'Too many attempts. Please try again later.',
+        'auth/popup-closed-by-user':'Google sign-in was cancelled.',
+        'auth/popup-blocked':       'Popup was blocked. Allow popups for this site.',
+        'auth/invalid-credential':  'Invalid credentials. Please check and try again.',
+        'auth/user-disabled':       'This account has been disabled.',
+    };
+    return messages[code] || 'An error occurred. Please try again.';
+}
+
+// ── KEYBOARD ENTER SUBMIT ──
 function setupKeyboardSubmit() {
-    ['loginEmail','loginPassword'].forEach(id => {
-        document.getElementById(id)?.addEventListener('keydown', e => {
+    // Login form — Enter key
+    ['loginEmail', 'loginPassword'].forEach(id => {
+        document.getElementById(id)?.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') handleEmailLogin();
         });
     });
 
-    ['registerName','registerEmail','registerPassword','registerConfirmPassword']
-        .forEach(id => {
-        document.getElementById(id)?.addEventListener('keydown', e => {
+    // Register form — Enter key
+    ['registerName', 'registerEmail', 'registerPassword', 'registerConfirmPassword'].forEach(id => {
+        document.getElementById(id)?.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') handleEmailRegister();
         });
     });
 }
 
+// ── REAL-TIME VALIDATION ──
 function setupRealtimeValidation() {
+    // Email validation on blur
     document.getElementById('loginEmail')?.addEventListener('blur', function() {
-        if (this.value && !isValidEmail(this.value))
-            showError('loginEmailError', 'Enter a valid email');
-        else clearError('loginEmailError');
-    });
-
-    document.getElementById('registerEmail')?.addEventListener('blur', function() {
-        if (this.value && !isValidEmail(this.value))
-            showError('registerEmailError', 'Enter a valid email');
-        else clearError('registerEmailError');
-    });
-
-    document.getElementById('registerConfirmPassword')?.addEventListener('input',
-        function() {
-        const pw = document.getElementById('registerPassword').value;
-        if (this.value && pw !== this.value)
-            showError('registerConfirmError', 'Passwords don\'t match');
-        else {
-            clearError('registerConfirmError');
-            if (this.value && pw === this.value) this.classList.add('success');
+        if (this.value && !isValidEmail(this.value)) {
+            showError('loginEmailError', 'Enter a valid email address');
+        } else {
+            clearError('loginEmailError');
         }
     });
 
+    document.getElementById('registerEmail')?.addEventListener('blur', function() {
+        if (this.value && !isValidEmail(this.value)) {
+            showError('registerEmailError', 'Enter a valid email address');
+        } else {
+            clearError('registerEmailError');
+        }
+    });
+
+    // Password match check
+    document.getElementById('registerConfirmPassword')?.addEventListener('input', function() {
+        const pw = document.getElementById('registerPassword').value;
+        if (this.value && pw !== this.value) {
+            showError('registerConfirmError', 'Passwords do not match');
+        } else {
+            clearError('registerConfirmError');
+            if (this.value) this.classList.add('success');
+        }
+    });
+
+    // Clear errors on input
     document.querySelectorAll('.auth-input').forEach(input => {
-        input.addEventListener('input', () =>
-            clearError(input.id + 'Error'));
+        input.addEventListener('input', function() {
+            const errorId = this.id.replace('login', 'login').replace('register', 'register') + 'Error';
+            clearError(this.id + 'Error');
+        });
     });
 }
 
+// ── BUTTON EVENT LISTENERS ──
 function setupEventListeners() {
-    document.getElementById('googleSignInBtn')
-        ?.addEventListener('click', handleGoogleSignIn);
-    document.getElementById('googleRegisterBtn')
-        ?.addEventListener('click', handleGoogleSignIn);
-    document.getElementById('loginSubmitBtn')
-        ?.addEventListener('click', handleEmailLogin);
-    document.getElementById('registerSubmitBtn')
-        ?.addEventListener('click', handleEmailRegister);
-    document.getElementById('guestBtn')
-        ?.addEventListener('click', handleGuestLogin);
-    document.getElementById('forgotPwBtn')
-        ?.addEventListener('click', (e) => {
-            e.preventDefault();
-            handleForgotPassword();
-        });
+    // Google Sign In
+    document.getElementById('googleSignInBtn')?.addEventListener('click', handleGoogleSignIn);
+    document.getElementById('googleRegisterBtn')?.addEventListener('click', handleGoogleSignIn);
+
+    // Email Login
+    document.getElementById('loginSubmitBtn')?.addEventListener('click', handleEmailLogin);
+
+    // Email Register
+    document.getElementById('registerSubmitBtn')?.addEventListener('click', handleEmailRegister);
+
+    // Guest
+    document.getElementById('guestBtn')?.addEventListener('click', handleGuestLogin);
+
+    // Forgot Password
+    document.getElementById('forgotPwBtn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        handleForgotPassword();
+    });
 }
 
+// ── LOADER ──
 function hideLoader() {
-    setTimeout(() => {
-        document.getElementById('loaderScreen')?.classList.add('hide');
-    }, 800);
+    const loader = document.getElementById('loaderScreen');
+    if (loader) {
+        setTimeout(() => loader.classList.add('hide'), 800);
+    }
 }
 
-// ══════════════════════════════════════════
-// INIT
-// ══════════════════════════════════════════
+// ── INIT ──
 document.addEventListener('DOMContentLoaded', () => {
     initFirebase();
     checkExistingSession();
@@ -657,8 +574,12 @@ document.addEventListener('DOMContentLoaded', () => {
     setupRealtimeValidation();
     hideLoader();
 
-    console.log('%c💰 AitoolCor MoneyWise',
-        'color:#6366F1;font-size:18px;font-weight:bold;');
-    console.log('%chttps://moneywise.aitoolcor.com',
-        'color:#94A3B8;font-size:11px;');
+    console.log(
+        '%c💰 AitoolCor MoneyWise',
+        'color:#6366F1; font-size:18px; font-weight:bold;'
+    );
+    console.log(
+        '%chttps://moneywise.aitoolcor.com',
+        'color:#94A3B8; font-size:11px;'
+    );
 });
