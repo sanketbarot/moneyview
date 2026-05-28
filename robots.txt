@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://moneywise.aitoolcor.com/sitemap.xml
+
+Disallow: /js/
+Disallow: /css/

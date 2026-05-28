@@ -1,0 +1,87 @@
+{
+    "name": "AitoolCor MoneyWise",
+    "short_name": "MoneyWise",
+    "description": "Smart Money Manager — Track expenses, budgets and goals",
+    "start_url": "/",
+    "scope": "/",
+    "display": "standalone",
+    "orientation": "portrait-primary",
+    "background_color": "#F0F4FF",
+    "theme_color": "#6366F1",
+    "lang": "en",
+    "categories": ["finance", "productivity", "utilities"],
+    "icons": [
+        {
+            "src": "assets/icons/icon-72.png",
+            "sizes": "72x72",
+            "type": "image/png",
+            "purpose": "maskable any"
+        },
+        {
+            "src": "assets/icons/icon-96.png",
+            "sizes": "96x96",
+            "type": "image/png",
+            "purpose": "maskable any"
+        },
+        {
+            "src": "assets/icons/icon-128.png",
+            "sizes": "128x128",
+            "type": "image/png",
+            "purpose": "maskable any"
+        },
+        {
+            "src": "assets/icons/icon-144.png",
+            "sizes": "144x144",
+            "type": "image/png",
+            "purpose": "maskable any"
+        },
+        {
+            "src": "assets/icons/icon-152.png",
+            "sizes": "152x152",
+            "type": "image/png",
+            "purpose": "maskable any"
+        },
+        {
+            "src": "assets/icons/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable any"
+        },
+        {
+            "src": "assets/icons/icon-384.png",
+            "sizes": "384x384",
+            "type": "image/png",
+            "purpose": "maskable any"
+        },
+        {
+            "src": "assets/icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable any"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "assets/og-image.png",
+            "sizes": "1200x630",
+            "type": "image/png",
+            "label": "MoneyWise Dashboard"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Add Transaction",
+            "short_name": "Add",
+            "url": "/app.html",
+            "icons": [{ "src": "assets/icons/icon-96.png", "sizes": "96x96" }]
+        },
+        {
+            "name": "Dashboard",
+            "short_name": "Dashboard",
+            "url": "/app.html",
+            "icons": [{ "src": "assets/icons/icon-96.png", "sizes": "96x96" }]
+        }
+    ],
+    "related_applications": [],
+    "prefer_related_applications": false
+}
